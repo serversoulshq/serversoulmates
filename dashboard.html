@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Soulmates</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 30px;
+      background: #1e293b;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .card {
+      width: 300px;
+      background: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .like { background: green; color: white; }
+    .skip { background: red; color: white; }
+  </style>
+</head>
+
+<body>
+
+<div class="navbar">
+  <h2>Server Soulmates ❤️</h2>
+  <div id="userEmail"></div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <img src="https://randomuser.me/api/portraits/women/44.jpg">
+    <h3>Emma, 21</h3>
+    <p>Loves coding & coffee ☕</p>
+
+    <div class="buttons">
+      <button class="skip">Skip</button>
+      <button class="like">Like</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "yrrytfnfklqlmtsgpcvi",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlycnl0Zm5ma2xxbG10c2dwY3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDY1ODUsImV4cCI6MjA5MTIyMjU4NX0.wBPIR3x-b6rig0a32kdH6CwpszEKNj6qXZvrKGwKhWU"
+);
+
+async function checkUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // ❌ Not logged in
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // 🔒 Try inserting into DB (RLS will block non-IISER)
+  const { error } = await supabase
+    .from('users')
+    .insert([
+      { id: user.id, email: user.email }
+    ]);
+
+  // ❌ If blocked → logout
+  if (error) {
+    alert("Only IISERB emails allowed");
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Show email
+  document.getElementById("userEmail").innerText = user.email;
+}
+
+checkUser();
+</script>
+
+</body>
+</html>
