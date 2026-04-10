@@ -464,17 +464,18 @@
 
   // ── Listen for Google redirect coming back ────────────────────
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      const email = session.user.email;
-      if (!isAllowed(email)) {
-        // Not a college email — sign them out immediately
-        await sb.auth.signOut();
-        alert('Access denied. Only @iiserb.ac.in email addresses are allowed.');
-        return;
-      }
-      // ✅ Valid college email via Google
-      showStep(3);
-    }
+if (event === 'SIGNED_IN' && session) {
+  const email = session.user.email;
+
+  if (!isAllowed(email)) {
+    await sb.auth.signOut();
+    alert('Access denied. Only @iiserb.ac.in emails allowed.');
+    return;
+  }
+
+  // 🚀 Directly route properly
+  goToApp();
+}
   });
 
   // ── Send OTP ──────────────────────────────────────────────────
@@ -557,10 +558,30 @@
   }
 
   // ── After login: redirect to your app ────────────────────────
-  function goToApp() {
-    // ✅ Change this to your actual app's main page URL when ready
-    window.location.href = '/dashboard.html';
+async function goToApp() {
+  const { data: { user } } = await sb.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/login.html";
+    return;
   }
+
+  // 🔍 Check if profile exists
+  const { data, error } = await sb
+    .from("profiles")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  // ❌ No profile → go to onboarding
+  if (error || !data) {
+    window.location.href = "/onboarding.html";
+    return;
+  }
+
+  // ✅ Profile exists → go to main app
+  window.location.href = "/index.html";
+}
 </script>
 </body>
 </html>
