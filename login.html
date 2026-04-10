@@ -367,7 +367,7 @@
   <!-- STEP 2: OTP verification -->
   <div id="step2" class="step">
     <h1 class="headline">check your inbox</h1>
-    <p class="subline">We sent a 6-digit code to <strong id="emailDisplay" style="color:#e8859a;font-style:italic;"></strong></p>
+    <p class="subline">We sent an 8-digit code to <strong id="emailDisplay" style="color:#e8859a;font-style:italic;"></strong></p>
 
     <div class="badge">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" stroke="#4caf7d"/><path d="M3.5 6l2 2 3-3" stroke="#4caf7d" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -376,7 +376,7 @@
 
     <div class="input-group">
       <label>Verification code</label>
-      <input type="text" id="otpInput" class="otp-input" placeholder="000000" maxlength="6" oninput="onOtpInput()" />
+      <input type="text" id="otpInput" class="otp-input" placeholder="00000000" maxlength="8" oninput="onOtpInput()" />
       <div class="msg error" id="otpError">Invalid code. Please check your email and try again.</div>
     </div>
 
@@ -404,21 +404,6 @@
   // ── Init Supabase ──────────────────────────────────────────────
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  // ✅ Check existing session on page load (important!)
-(async () => {
-  const { data: { session } } = await sb.auth.getSession();
-
-  if (session?.user) {
-    const email = session.user.email;
-
-    if (!isAllowed(email)) {
-      await sb.auth.signOut();
-      alert('Access denied. Only @iiserb.ac.in emails allowed.');
-    } else {
-      showStep(3);
-    }
-  }
-})();
 
   let currentEmail = '';
 
@@ -465,11 +450,9 @@
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
-       redirectTo: window.location.origin,
-       queryParams: {
-    	hd: ALLOWED_DOMAIN
-  }
-}
+        redirectTo: window.location.href,
+        // After redirect, we check the email domain (see onAuthStateChange below)
+      }
     });
 
     if (error) {
@@ -480,20 +463,19 @@
   }
 
   // ── Listen for Google redirect coming back ────────────────────
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event !== 'SIGNED_IN' || !session?.user) return;
-
-  const email = session.user.email;
-
-  if (!email.endsWith('@iiserb.ac.in')) {
-    await sb.auth.signOut();
-    alert('Only @iiserb.ac.in emails are allowed.');
-    return;
-  }
-
-  // ONLY allow UI change here
-  showStep(3);
-});
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      const email = session.user.email;
+      if (!isAllowed(email)) {
+        // Not a college email — sign them out immediately
+        await sb.auth.signOut();
+        alert('Access denied. Only @iiserb.ac.in email addresses are allowed.');
+        return;
+      }
+      // ✅ Valid college email via Google
+      showStep(3);
+    }
+  });
 
   // ── Send OTP ──────────────────────────────────────────────────
   async function sendOtp() {
@@ -527,7 +509,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
   // ── OTP input ─────────────────────────────────────────────────
   function onOtpInput() {
     const val = document.getElementById('otpInput').value.trim();
-    document.getElementById('otpBtn').disabled = val.length !== 6;
+    document.getElementById('otpBtn').disabled = val.length !== 8;
     document.getElementById('otpError').classList.remove('show');
     document.getElementById('otpInput').classList.remove('err');
   }
