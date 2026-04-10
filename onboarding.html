@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server Souls — Set up your profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #080810;
+      --surface: #10101c;
+      --surface2: #181828;
+      --surface3: #1e1e30;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.14);
+      --text: #ede9e4;
+      --muted: #7a7890;
+      --muted2: #55536a;
+      --accent: #c2607a;
+      --accent-light: #e8859a;
+      --accent-glow: rgba(194,96,122,0.18);
+      --accent-glow2: rgba(194,96,122,0.08);
+      --success: #4caf7d;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── Ambient orbs ── */
+    .orb {
+      position: fixed; border-radius: 50%;
+      pointer-events: none; filter: blur(90px);
+    }
+    .orb-1 {
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(194,96,122,0.11), transparent 70%);
+      top: -160px; left: -120px;
+      animation: driftA 16s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(90,70,190,0.08), transparent 70%);
+      bottom: -100px; right: -80px;
+      animation: driftB 20s ease-in-out infinite alternate;
+    }
+    @keyframes driftA { to { transform: translate(50px, 60px); } }
+    @keyframes driftB { to { transform: translate(-60px, -40px); } }
+
+    /* ── Layout shell ── */
+    .shell {
+      position: relative; z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 36px 0;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 9px;
+    }
+    .brand-icon {
+      width: 30px; height: 30px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(194,96,122,0.28);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 600;
+      color: var(--text);
+    }
+    .step-counter {
+      font-size: 12px; color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    .step-counter span { color: var(--accent-light); }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      padding: 16px 36px 0;
+      flex-shrink: 0;
+    }
+    .progress-track {
+      height: 2px;
+      background: var(--surface3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 2px;
+      transition: width 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+      width: 25%;
+    }
+
+    /* ── Scrollable content area ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 36px 32px;
+      scrollbar-width: none;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    /* ── Steps ── */
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: stepIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .step.leaving {
+      animation: stepOut 0.25s ease-in forwards;
+    }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes stepOut {
+      to   { opacity: 0; transform: translateX(-28px); }
+    }
+
+    .step-head {
+      padding-top: 36px;
+      margin-bottom: 32px;
+    }
+    .step-eyebrow {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+    .step-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .step-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Form elements ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .field input[type="text"],
+    .field input[type="date"],
+    .field select {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field input::placeholder { color: var(--muted2); }
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow2);
+    }
+    .field input.valid {
+      border-color: rgba(76,175,125,0.4);
+    }
+
+    /* Select wrapper for arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+    .select-wrap select { cursor: pointer; padding-right: 36px; }
+    .select-wrap select option { background: #1c1c2e; }
+
+    /* ── Gender pill grid ── */
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      padding: 9px 18px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.18s;
+      user-select: none;
+    }
+    .pill:hover { border-color: var(--border-hover); color: var(--text); }
+    .pill.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent-light);
+    }
+
+    /* ── Looking-for row ── */
+    .lf-grid {
+      display: flex;
+      gap: 8px;
+    }
+    .lf-grid .pill { flex: 1; text-align: center; justify-content: center; }
+
+    /* ── Campus turf grid ── */
+    .turf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .turf-card {
+      padding: 14px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+      user-select: none;
+    }
+    .turf-card:hover { border-color: var(--border-hover); }
+    .turf-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow2);
+    }
+    .turf-card .turf-icon { font-size: 20px; margin-bottom: 6px; }
+    .turf-card .turf-name { font-size: 13px; color: var(--text); }
+    .turf-card .turf-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .turf-card.selected .turf-name { color: var(--accent-light); }
+
+    /* ── Prompt cards ── */
+    .prompt-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .prompt-card {
+      padding: 16px 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .prompt-card:hover { border-color: var(--border-hover); }
+    .prompt-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow2);
+    }
+    .prompt-text {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.4;
+      transition: color 0.18s;
+    }
+    .prompt-card.selected .prompt-text { color: var(--accent-light); }
+    .prompt-card.selected .prompt-text::before {
+      content: '"';
+    }
+
+    .prompt-answer-wrap {
+      margin-top: 10px;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .prompt-answer-wrap.open {
+      max-height: 120px;
+      opacity: 1;
+    }
+    .prompt-answer {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-body);
+      outline: none;
+      resize: none;
+      transition: border-color 0.2s;
+      margin-top: 10px;
+    }
+    .prompt-answer:focus { border-color: var(--accent); }
+    .prompt-answer::placeholder { color: var(--muted2); }
+
+    /* ── Photo upload ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .photo-slot {
+      aspect-ratio: 3/4;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background: var(--surface2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-slot:hover {
+      border-color: var(--accent);
+      background: var(--accent-glow2);
+    }
+    .photo-slot .slot-icon {
+      font-size: 22px; opacity: 0.3; margin-bottom: 6px;
+    }
+    .photo-slot .slot-label {
+      font-size: 11px; color: var(--muted2);
+      letter-spacing: 0.04em;
+    }
+    .photo-slot.required .slot-label { color: var(--accent); opacity: 0.7; }
+    .photo-slot img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .photo-slot .remove-btn {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 24px; height: 24px;
+      background: rgba(8,8,16,0.8);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--text);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .photo-slot:hover .remove-btn { opacity: 1; }
+    input[type="file"] { display: none; }
+
+    .photo-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted2);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      padding: 16px 36px 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      background: rgba(8,8,16,0.7);
+      backdrop-filter: blur(8px);
+    }
+    .btn-back {
+      padding: 13px 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-back:hover { border-color: var(--border-hover); color: var(--text); }
+
+    .btn-next {
+      flex: 1;
+      padding: 13px 20px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 15px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, opacity 0.2s;
+    }
+    .btn-next:hover:not(:disabled) { background: var(--accent-light); }
+    .btn-next:active:not(:disabled) { transform: scale(0.98); }
+    .btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ── Inline pair fields ── */
+    .field-row {
+      display: grid;
+      gap: 12px;
+    }
+    .field-row.two { grid-template-columns: 1fr 1fr; }
+
+    /* ── Error msg ── */
+    .err-msg {
+      font-size: 12px; color: #e05c5c;
+      margin-top: 6px; display: none;
+    }
+    .err-msg.show { display: block; }
+
+    /* ── Auth guard ── */
+    #authGuard {
+      position: fixed; inset: 0;
+      background: var(--bg); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .topbar, .progress-wrap, .content, .bottom-nav { padding-left: 22px; padding-right: 22px; }
+      .step-title { font-size: 28px; }
+      .turf-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="authGuard"><div class="spinner"></div></div>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="shell">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+          <path d="M9 15.5S2 11.2 2 6.5A4.5 4.5 0 0 1 9 3.07 4.5 4.5 0 0 1 16 6.5C16 11.2 9 15.5 9 15.5z" fill="#c2607a"/>
+        </svg>
+      </div>
+      <span class="brand-name">Server Souls</span>
+    </div>
+    <span class="step-counter">Step <span id="stepNum">1</span> of 4</span>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content" id="contentScroll">
+
+    <!-- ══ STEP 1: Essentials ══ -->
+    <div class="step active" id="step1">
+      <div class="step-head">
+        <div class="step-eyebrow">Step 1</div>
+        <h1 class="step-title">let's start<br>with the basics</h1>
+        <p class="step-sub">Just a few things so people know who they're talking to.</p>
+      </div>
+
+      <div class="field">
+        <label>First name</label>
+        <input type="text" id="firstName" placeholder="What do people call you?" oninput="validateStep1()" />
+      </div>
+
+      <div class="field">
+        <label>Date of birth</label>
+        <input type="date" id="dob" onchange="validateStep1()" />
+        <div class="err-msg" id="dobError">You must be 18 or older to join.</div>
+      </div>
+
+      <div class="field">
+        <label>I am a</label>
+        <div class="pill-grid" id="genderGrid">
+          <div class="pill" data-val="Man" onclick="selectPill('genderGrid', this); validateStep1()">Man</div>
+          <div class="pill" data-val="Woman" onclick="selectPill('genderGrid', this); validateStep1()">Woman</div>
+          <div class="pill" data-val="Non-binary" onclick="selectPill('genderGrid', this); validateStep1()">Non-binary</div>
+          <div class="pill" data-val="Other" onclick="selectPill('genderGrid', this); validateStep1()">Other</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Looking for</label>
+        <div class="pill-grid lf-grid" id="lookingGrid">
+          <div class="pill" data-val="Men" onclick="selectPill('lookingGrid', this); validateStep1()">Men</div>
+          <div class="pill" data-val="Women" onclick="selectPill('lookingGrid', this); validateStep1()">Women</div>
+          <div class="pill" data-val="Everyone" onclick="selectPill('lookingGrid', this); validateStep1()">Everyone</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2: Campus Identity ══ -->
+    <div class="step" id="step2">
+      <div class="step-head">
+        <div class="step-eyebrow">Step 2</div>
+        <h1 class="step-title">your campus<br>identity</h1>
+        <p class="step-sub">Help people place you on campus.</p>
+      </div>
+
+      <div class="field">
+        <label>Year</label>
+        <div class="select-wrap">
+          <select id="year" onchange="validateStep2()">
+            <option value="" disabled selected>Select your year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+            <option value="5th Year">5th Year</option>
+            <option value="PhD">PhD Student</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Major / Programme</label>
+        <div class="select-wrap">
+          <select id="major" onchange="validateStep2()">
+            <option value="" disabled selected>What do you study?</option>
+            <option>Biology</option>
+            <option>Chemistry</option>
+            <option>Physics</option>
+            <option>Mathematics</option>
+            <option>Computer Science</option>
+            <option>Earth & Environmental Sciences</option>
+            <option>Humanities & Social Sciences</option>
+            <option>Economics</option>
+            <option>Engineering</option>
+            <option>Data Science</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Campus turf</label>
+        <div class="turf-grid" id="turfGrid">
+          <div class="turf-card" data-val="Hostel A" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🏠</div>
+            <div class="turf-name">Hostel A</div>
+            <div class="turf-sub">Boys</div>
+          </div>
+          <div class="turf-card" data-val="Hostel B" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🏠</div>
+            <div class="turf-name">Hostel B</div>
+            <div class="turf-sub">Boys</div>
+          </div>
+          <div class="turf-card" data-val="Hostel C" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🏠</div>
+            <div class="turf-name">Hostel C</div>
+            <div class="turf-sub">Girls</div>
+          </div>
+          <div class="turf-card" data-val="Hostel D" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🏠</div>
+            <div class="turf-name">Hostel D</div>
+            <div class="turf-sub">Girls</div>
+          </div>
+          <div class="turf-card" data-val="PhD Quarters" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🎓</div>
+            <div class="turf-name">PhD Quarters</div>
+            <div class="turf-sub">Research scholars</div>
+          </div>
+          <div class="turf-card" data-val="Day Scholar" onclick="selectTurf(this); validateStep2()">
+            <div class="turf-icon">🚌</div>
+            <div class="turf-name">Day Scholar</div>
+            <div class="turf-sub">Commuter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: Campus Vibe ══ -->
+    <div class="step" id="step3">
+      <div class="step-head">
+        <div class="step-eyebrow">Step 3</div>
+        <h1 class="step-title">your campus<br>vibe</h1>
+        <p class="step-sub">Pick one prompt and give a real answer. This is your conversation starter.</p>
+      </div>
+
+      <div class="prompt-list" id="promptList">
+
+        <div class="prompt-card" data-idx="0" onclick="selectPrompt(this)">
+          <div class="prompt-text">My go-to survival meal during finals is...</div>
+          <div class="prompt-answer-wrap">
+            <textarea class="prompt-answer" rows="2" placeholder="be honest..." oninput="validateStep3()"></textarea>
+          </div>
+        </div>
+
+        <div class="prompt-card" data-idx="1" onclick="selectPrompt(this)">
+          <div class="prompt-text">You'll most likely find me on campus at...</div>
+          <div class="prompt-answer-wrap">
+            <textarea class="prompt-answer" rows="2" placeholder="library 3rd floor at 2am, probably..." oninput="validateStep3()"></textarea>
+          </div>
+        </div>
+
+        <div class="prompt-card" data-idx="2" onclick="selectPrompt(this)">
+          <div class="prompt-text">Most controversial opinion about the dining hall...</div>
+          <div class="prompt-answer-wrap">
+            <textarea class="prompt-answer" rows="2" placeholder="say what everyone's thinking..." oninput="validateStep3()"></textarea>
+          </div>
+        </div>
+
+        <div class="prompt-card" data-idx="3" onclick="selectPrompt(this)">
+          <div class="prompt-text">Best spot to skip class and hang out...</div>
+          <div class="prompt-answer-wrap">
+            <textarea class="prompt-answer" rows="2" placeholder="your secret spot..." oninput="validateStep3()"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ STEP 4: Photos ══ -->
+    <div class="step" id="step4">
+      <div class="step-head">
+        <div class="step-eyebrow">Step 4</div>
+        <h1 class="step-title">show your<br>face</h1>
+        <p class="step-sub">At least one photo. Up to three. Keep it real.</p>
+      </div>
+
+      <div class="photo-grid">
+        <div class="photo-slot required" id="slot0" onclick="triggerUpload(0)">
+          <div class="slot-icon">＋</div>
+          <div class="slot-label">Main photo</div>
+          <div class="remove-btn" onclick="removePhoto(event, 0)">✕</div>
+        </div>
+        <div class="photo-slot" id="slot1" onclick="triggerUpload(1)">
+          <div class="slot-icon">＋</div>
+          <div class="slot-label">Photo 2</div>
+          <div class="remove-btn" onclick="removePhoto(event, 1)">✕</div>
+        </div>
+        <div class="photo-slot" id="slot2" onclick="triggerUpload(2)">
+          <div class="slot-icon">＋</div>
+          <div class="slot-label">Photo 3</div>
+          <div class="remove-btn" onclick="removePhoto(event, 2)">✕</div>
+        </div>
+      </div>
+
+      <input type="file" id="fileInput0" accept="image/*" onchange="handlePhoto(event, 0)" />
+      <input type="file" id="fileInput1" accept="image/*" onchange="handlePhoto(event, 1)" />
+      <input type="file" id="fileInput2" accept="image/*" onchange="handlePhoto(event, 2)" />
+
+      <p class="photo-note">Photos are only shown to verified IISERB students. First photo is your profile picture.</p>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="btn-back" id="backBtn" onclick="goBack()" style="display:none">← Back</button>
+    <button class="btn-next" id="nextBtn" onclick="goNext()" disabled>Continue →</button>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+  const SUPABASE_URL = "https://yrrytfnfklqlmtsgpcvi.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlycnl0Zm5ma2xxbG10c2dwY3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDY1ODUsImV4cCI6MjA5MTIyMjU4NX0.wBPIR3x-b6rig0a32kdH6CwpszEKNj6qXZvrKGwKhWU";
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentStep = 1;
+  const TOTAL_STEPS = 4;
+  let photos = [null, null, null];
+
+  // ── Auth guard ───────────────────────────────────────────────
+  async function init() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) { window.location.href = "login.html"; return; }
+    document.getElementById("authGuard").style.display = "none";
+    updateProgress();
+  }
+
+  // ── Progress ─────────────────────────────────────────────────
+  function updateProgress() {
+    const pct = (currentStep / TOTAL_STEPS) * 100;
+    document.getElementById("progressFill").style.width = pct + "%";
+    document.getElementById("stepNum").textContent = currentStep;
+    document.getElementById("backBtn").style.display = currentStep > 1 ? "block" : "none";
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.textContent = currentStep === TOTAL_STEPS ? "Complete profile →" : "Continue →";
+  }
+
+  // ── Pill selector ─────────────────────────────────────────────
+  function selectPill(gridId, el) {
+    document.querySelectorAll(`#${gridId} .pill`).forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── Turf selector ─────────────────────────────────────────────
+  function selectTurf(el) {
+    document.querySelectorAll('#turfGrid .turf-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── Prompt selector ──────────────────────────────────────────
+  function selectPrompt(el) {
+    document.querySelectorAll('#promptList .prompt-card').forEach(c => {
+      c.classList.remove('selected');
+      c.querySelector('.prompt-answer-wrap').classList.remove('open');
+    });
+    el.classList.add('selected');
+    el.querySelector('.prompt-answer-wrap').classList.add('open');
+    el.querySelector('.prompt-answer').focus();
+    validateStep3();
+  }
+
+  // ── Photo upload ─────────────────────────────────────────────
+  function triggerUpload(idx) {
+    document.getElementById(`fileInput${idx}`).click();
+  }
+  function handlePhoto(e, idx) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    photos[idx] = { file, url };
+    const slot = document.getElementById(`slot${idx}`);
+    // remove old img
+    slot.querySelector('img')?.remove();
+    const img = document.createElement('img');
+    img.src = url; img.alt = '';
+    slot.prepend(img);
+    slot.querySelector('.slot-icon').style.display = 'none';
+    slot.querySelector('.slot-label').style.display = 'none';
+    validateStep4();
+  }
+  function removePhoto(e, idx) {
+    e.stopPropagation();
+    photos[idx] = null;
+    const slot = document.getElementById(`slot${idx}`);
+    slot.querySelector('img')?.remove();
+    slot.querySelector('.slot-icon').style.display = '';
+    slot.querySelector('.slot-label').style.display = '';
+    document.getElementById(`fileInput${idx}`).value = '';
+    validateStep4();
+  }
+
+  // ── Validators ───────────────────────────────────────────────
+  function setNextBtn(enabled) {
+    document.getElementById("nextBtn").disabled = !enabled;
+  }
+
+  function validateStep1() {
+    const name = document.getElementById("firstName").value.trim();
+    const dob  = document.getElementById("dob").value;
+    const gender = document.querySelector('#genderGrid .pill.selected');
+    const looking = document.querySelector('#lookingGrid .pill.selected');
+    const dobErr = document.getElementById("dobError");
+
+    let dobOk = false;
+    if (dob) {
+      const age = Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000));
+      dobOk = age >= 18;
+      dobErr.classList.toggle('show', !dobOk);
+    }
+
+    setNextBtn(name.length >= 2 && dobOk && !!gender && !!looking);
+  }
+
+  function validateStep2() {
+    const year  = document.getElementById("year").value;
+    const major = document.getElementById("major").value;
+    const turf  = document.querySelector('#turfGrid .turf-card.selected');
+    setNextBtn(!!year && !!major && !!turf);
+  }
+
+  function validateStep3() {
+    const selected = document.querySelector('#promptList .prompt-card.selected');
+    if (!selected) { setNextBtn(false); return; }
+    const answer = selected.querySelector('.prompt-answer').value.trim();
+    setNextBtn(answer.length >= 5);
+  }
+
+  function validateStep4() {
+    setNextBtn(!!photos[0]);
+  }
+
+  // ── Navigation ───────────────────────────────────────────────
+  function goBack() {
+    if (currentStep <= 1) return;
+    transition(currentStep, currentStep - 1);
+  }
+
+  function goNext() {
+    if (currentStep < TOTAL_STEPS) {
+      transition(currentStep, currentStep + 1);
+    } else {
+      submitProfile();
+    }
+  }
+
+  function transition(from, to) {
+    const fromEl = document.getElementById(`step${from}`);
+    const toEl   = document.getElementById(`step${to}`);
+    fromEl.classList.add('leaving');
+    setTimeout(() => {
+      fromEl.classList.remove('active', 'leaving');
+      toEl.classList.add('active');
+      currentStep = to;
+      updateProgress();
+      setNextBtn(false);
+      document.getElementById('contentScroll').scrollTop = 0;
+      // trigger validators on arrival
+      if (to === 2) validateStep2();
+      if (to === 3) validateStep3();
+      if (to === 4) validateStep4();
+    }, 220);
+  }
+
+  // ── Submit ───────────────────────────────────────────────────
+  async function submitProfile() {
+    const btn = document.getElementById("nextBtn");
+    btn.textContent = "Saving...";
+    btn.disabled = true;
+
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) { window.location.href = "login.html"; return; }
+
+    const dob = new Date(document.getElementById("dob").value);
+    const age = Math.floor((Date.now() - dob) / (365.25 * 24 * 3600 * 1000));
+
+    const selectedPromptCard = document.querySelector('#promptList .prompt-card.selected');
+    const promptText  = selectedPromptCard?.querySelector('.prompt-text')?.textContent?.trim() || '';
+    const promptAnswer = selectedPromptCard?.querySelector('.prompt-answer')?.value?.trim() || '';
+
+    const profile = {
+      user_id:       user.id,
+      first_name:    document.getElementById("firstName").value.trim(),
+      age:           age,
+      gender:        document.querySelector('#genderGrid .pill.selected')?.dataset.val,
+      looking_for:   document.querySelector('#lookingGrid .pill.selected')?.dataset.val,
+      year:          document.getElementById("year").value,
+      major:         document.getElementById("major").value,
+      campus_turf:   document.querySelector('#turfGrid .turf-card.selected')?.dataset.val,
+      prompt_q:      promptText,
+      prompt_a:      promptAnswer,
+    };
+
+    const { error } = await sb.from('profiles').upsert([profile], { onConflict: 'user_id' });
+
+    if (error) {
+      alert("Something went wrong: " + error.message);
+      btn.textContent = "Complete profile →";
+      btn.disabled = false;
+      return;
+    }
+
+    // TODO: upload photos to Supabase Storage
+    // For now redirect to dashboard
+    window.location.href = "dashboard.html";
+  }
+
+  init();
+</script>
+</body>
+</html>
