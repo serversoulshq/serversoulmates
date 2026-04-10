@@ -443,11 +443,14 @@
 
   // ── Google OAuth ──────────────────────────────────────────────
   async function signInWithGoogle() {
-    sb.auth.signOut();
-    
+
     const btn = document.getElementById('googleBtn');
     btn.textContent = 'Redirecting...';
     btn.disabled = true;
+
+        await sb.auth.signOut();
+     sessionStorage.clear();
+  localStorage.removeItem('supabase.auth.token');
 
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
