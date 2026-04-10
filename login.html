@@ -443,20 +443,14 @@
 
   // ── Google OAuth ──────────────────────────────────────────────
   async function signInWithGoogle() {
-
     const btn = document.getElementById('googleBtn');
     btn.textContent = 'Redirecting...';
     btn.disabled = true;
-
-        await sb.auth.signOut();
-     sessionStorage.clear();
-  localStorage.removeItem('supabase.auth.token');
 
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.href,
-        prompt: 'select_account'
         // After redirect, we check the email domain (see onAuthStateChange below)
       }
     });
@@ -470,17 +464,17 @@
 
   // ── Listen for Google redirect coming back ────────────────────
   sb.auth.onAuthStateChange(async (event, session) => {
-if (event === 'SIGNED_IN' && session) {
-  const email = session.user.email;
-
-  if (!isAllowed(email)) {
-    await sb.auth.signOut();
-    alert('Access denied. Only @iiserb.ac.in emails allowed.');
-    return;
-  }
-
-  showStep(3);
-}
+    if (event === 'SIGNED_IN' && session) {
+      const email = session.user.email;
+      if (!isAllowed(email)) {
+        // Not a college email — sign them out immediately
+        await sb.auth.signOut();
+        alert('Access denied. Only @iiserb.ac.in email addresses are allowed.');
+        return;
+      }
+      // ✅ Valid college email via Google
+      showStep(3);
+    }
   });
 
   // ── Send OTP ──────────────────────────────────────────────────
@@ -563,30 +557,10 @@ if (event === 'SIGNED_IN' && session) {
   }
 
   // ── After login: redirect to your app ────────────────────────
-async function goToApp() {
-  const { data: { user } } = await sb.auth.getUser();
-
-  if (!user) {
-    window.location.href = "/login.html";
-    return;
+  function goToApp() {
+    // ✅ Change this to your actual app's main page URL when ready
+    window.location.href = '/dashboard.html';
   }
-
-  // 🔍 Check if profile exists
-  const { data, error } = await sb
-    .from("profiles")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  // ❌ No profile → go to onboarding
-  if (error || !data) {
-    window.location.href = "/onboarding.html";
-    return;
-  }
-
-  // ✅ Profile exists → go to main app
-  window.location.href = "/dashboard.html";
-}
 </script>
 </body>
 </html>
