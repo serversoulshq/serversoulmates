@@ -594,6 +594,51 @@
           </div>
         </div>
 
+        <div class="field" style="margin-bottom:22px">
+          <label>Home State</label>
+          <div class="select-wrap">
+            <select id="homeState" onchange="v2()">
+              <option value="" disabled selected>Where are you from?</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Chhattisgarh</option>
+              <option>Goa</option>
+              <option>Gujarat</option>
+              <option>Haryana</option>
+              <option>Himachal Pradesh</option>
+              <option>Jharkhand</option>
+              <option>Karnataka</option>
+              <option>Kerala</option>
+              <option>Madhya Pradesh</option>
+              <option>Maharashtra</option>
+              <option>Manipur</option>
+              <option>Meghalaya</option>
+              <option>Mizoram</option>
+              <option>Nagaland</option>
+              <option>Odisha</option>
+              <option>Punjab</option>
+              <option>Rajasthan</option>
+              <option>Sikkim</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Tripura</option>
+              <option>Uttar Pradesh</option>
+              <option>Uttarakhand</option>
+              <option>West Bengal</option>
+              <option>Andaman &amp; Nicobar Islands</option>
+              <option>Chandigarh</option>
+              <option>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option>
+              <option>Delhi</option>
+              <option>Jammu &amp; Kashmir</option>
+              <option>Ladakh</option>
+              <option>Lakshadweep</option>
+              <option>Puducherry</option>
+            </select>
+          </div>
+        </div>
+
         <div class="field">
           <label>Campus turf</label>
           <div class="turf-grid" id="turfGrid">
@@ -601,7 +646,7 @@
               <div class="turf-icon">🏠</div><div class="turf-name">Hostel 1</div><div class="turf-sub">Boys</div>
             </div>
             <div class="turf-card" data-val="Hostel 2" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 2</div><div class="turf-sub">Girls</div>
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 2</div><div class="turf-sub">Boys</div>
             </div>
             <div class="turf-card" data-val="Hostel 3" onclick="pickTurf(this);v2()">
               <div class="turf-icon">🏠</div><div class="turf-name">Hostel 3</div><div class="turf-sub">Girls</div>
@@ -802,8 +847,9 @@
   function v2(){
     const yr=document.getElementById("year").value;
     const mj=document.getElementById("major").value;
+    const st=document.getElementById("homeState").value;
     const tf=document.querySelector('#turfGrid .turf-card.selected');
-    nb(!!yr&&!!mj&&!!tf);
+    nb(!!yr&&!!mj&&!!st&&!!tf);
   }
   function v3(){
     const sel=document.querySelector('#promptList .prompt-card.selected');
@@ -844,10 +890,11 @@
       year:document.getElementById("year").value,
       major:document.getElementById("major").value,
       campus_turf:document.querySelector('#turfGrid .turf-card.selected')?.dataset.val,
+      home_state:document.getElementById("homeState").value,
       prompt_q:sp?.querySelector('.prompt-q')?.textContent?.trim()||'',
       prompt_a:sp?.querySelector('.prompt-ans')?.value?.trim()||'',
     };
-    const {error}=await sb.from('profiles').upsert([profile],{onConflict:'user_id'});
+    const {error}=await sb.from('participants').upsert([profile],{onConflict:'user_id'});
     if(error){alert("Error: "+error.message);btn.textContent="Complete profile →";btn.disabled=false;return;}
     window.location.href="dashboard.html";
   }
