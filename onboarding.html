@@ -524,7 +524,7 @@
         <div class="field-row two" style="margin-bottom:22px">
           <div class="field" style="margin-bottom:0">
             <label>First name</label>
-            <input type="text" id="firstName" placeholder="What do they call you?" oninput="v1()" />
+            <input type="text" id="firstName" placeholder="Your name" oninput="v1()" />
           </div>
           <div class="field" style="margin-bottom:0">
             <label>Date of birth</label>
@@ -578,12 +578,16 @@
             <div class="select-wrap">
               <select id="major" onchange="v2()">
                 <option value="" disabled selected>What you study</option>
-                <option>Biology</option><option>Chemistry</option>
-                <option>Physics</option><option>Mathematics</option>
+                <option>Natural Sciences (1st Year)</option>
+                <option>B.Tech (1st Year)</option>
+                <option>Biology</option>
+                <option>Chemistry</option>
+                <option>Physics</option>
+                <option>Mathematics</option>
                 <option>Computer Science</option>
                 <option>Earth &amp; Environmental Sciences</option>
                 <option>Humanities &amp; Social Sciences</option>
-                <option>Economics</option><option>Engineering</option>
+                <option>Economics</option>
                 <option>Data Science</option>
               </select>
             </div>
@@ -593,23 +597,32 @@
         <div class="field">
           <label>Campus turf</label>
           <div class="turf-grid" id="turfGrid">
-            <div class="turf-card" data-val="Hostel A" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel A</div><div class="turf-sub">Boys</div>
+            <div class="turf-card" data-val="Hostel 1" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 1</div><div class="turf-sub">Boys</div>
             </div>
-            <div class="turf-card" data-val="Hostel B" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel B</div><div class="turf-sub">Boys</div>
+            <div class="turf-card" data-val="Hostel 2" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 2</div><div class="turf-sub">Boys</div>
             </div>
-            <div class="turf-card" data-val="Hostel C" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel C</div><div class="turf-sub">Girls</div>
+            <div class="turf-card" data-val="Hostel 3" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 3</div><div class="turf-sub">Girls</div>
             </div>
-            <div class="turf-card" data-val="Hostel D" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel D</div><div class="turf-sub">Girls</div>
+            <div class="turf-card" data-val="Hostel 4" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 4</div><div class="turf-sub">Boys</div>
             </div>
-            <div class="turf-card" data-val="PhD Quarters" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🎓</div><div class="turf-name">PhD Quarters</div><div class="turf-sub">Scholars</div>
+            <div class="turf-card" data-val="Hostel 5" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 5</div><div class="turf-sub">Girls</div>
             </div>
-            <div class="turf-card" data-val="Day Scholar" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🚌</div><div class="turf-name">Day Scholar</div><div class="turf-sub">Commuter</div>
+            <div class="turf-card" data-val="Hostel 6" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 6</div><div class="turf-sub">Boys</div>
+            </div>
+            <div class="turf-card" data-val="Hostel 7" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 7</div><div class="turf-sub">Boys</div>
+            </div>
+            <div class="turf-card" data-val="Hostel 8" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 8</div><div class="turf-sub">Boys</div>
+            </div>
+            <div class="turf-card" data-val="Hostel 9" onclick="pickTurf(this);v2()">
+              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 9</div><div class="turf-sub">Girls</div>
             </div>
           </div>
         </div>
@@ -699,6 +712,15 @@
     const { data:{user} } = await sb.auth.getUser();
     if (!user) { window.location.href="login.html"; return; }
     document.getElementById("authGuard").style.display="none";
+
+    // DOB limits: must be 18–35 years old (blocks trolling with year 1900 etc.)
+    const now = new Date();
+    const maxDate = new Date(now.getFullYear()-18, now.getMonth(), now.getDate());
+    const minDate = new Date(now.getFullYear()-35, now.getMonth(), now.getDate());
+    const dobEl = document.getElementById("dob");
+    dobEl.max = maxDate.toISOString().split('T')[0];
+    dobEl.min = minDate.toISOString().split('T')[0];
+
     syncUI();
   }
 
