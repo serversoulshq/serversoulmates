@@ -881,7 +881,7 @@
     const age=Math.floor((Date.now()-dob)/(365.25*86400000));
     const sp=document.querySelector('#promptList .prompt-card.selected');
     const profile={
-      id:user.id,
+      user_id:user.id,
       first_name:document.getElementById("firstName").value.trim(),
       age, gender:document.querySelector('#genderGrid .pill.selected')?.dataset.val,
       looking_for:document.querySelector('#lookingGrid .pill.selected')?.dataset.val,
@@ -892,7 +892,7 @@
       prompt_q:sp?.querySelector('.prompt-q')?.textContent?.trim()||'',
       prompt_a:sp?.querySelector('.prompt-ans')?.value?.trim()||'',
     };
-    const {error}=await sb.from('participants').upsert([profile],{onConflict:'id'});
+    const {error}=await sb.from('participants').upsert([profile],{onConflict:'user_id'});
     if(error){alert("Error: "+error.message);btn.textContent="Complete profile →";btn.disabled=false;return;}
     window.location.href="dashboard.html";
   }
