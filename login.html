@@ -477,19 +477,19 @@ sb.auth.onAuthStateChange(async (event, session) => {
     }
 
     // ✅ Check if user already onboarded
-    const { data } = await sb
-      .from('profiles')
-      .select('onboarded')
-      .eq('id', session.user.id)
-      .single();
+const { data } = await sb
+  .from('participants')
+  .select('user_id')
+  .eq('user_id', session.user.id)
+  .maybeSingle();
 
     window.history.replaceState({}, document.title, window.location.pathname);
 
-    if (!data?.onboarded) {
-      window.location.href = '/onboarding.html';
-    } else {
-      window.location.href = '/dashboard.html';
-    }
+if (!data) {
+  window.location.href = '/onboarding.html';
+} else {
+  window.location.href = '/dashboard.html';
+}
   }
 });
   // ── Send OTP ──────────────────────────────────────────────────
