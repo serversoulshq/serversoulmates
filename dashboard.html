@@ -287,7 +287,7 @@
     await loadMatchCount();
   }
 
-  async function loadProfiles() {
+async function loadProfiles() {
     try {
       profiles = await api("/api/discover");
       document.getElementById("loadWrap").style.display = "none";
@@ -297,7 +297,12 @@
       document.getElementById("discoverWrap").style.display = "flex";
       renderCard(0);
     } catch (e) {
-      document.getElementById("loadWrap").innerHTML = `<p style="color:var(--muted);font-size:14px">${e.message}</p>`;
+      // THE FIX: If the server says profile is incomplete, force them to onboarding!
+      if (e.message.includes("Complete your profile")) {
+        window.location.href = "/onboarding.html";
+      } else {
+        document.getElementById("loadWrap").innerHTML = `<p style="color:var(--muted);font-size:14px">${e.message}</p>`;
+      }
     }
   }
 
