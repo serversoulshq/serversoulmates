@@ -741,7 +741,7 @@
   </div><!-- /right-panel -->
 
 </div><!-- /layout -->
-
+<script src="/app.js"></script>
 <script>
   const SUPABASE_URL = "https://yrrytfnfklqlmtsgpcvi.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlycnl0Zm5ma2xxbG10c2dwY3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDY1ODUsImV4cCI6MjA5MTIyMjU4NX0.wBPIR3x-b6rig0a32kdH6CwpszEKNj6qXZvrKGwKhWU";
@@ -874,15 +874,38 @@
   }
 
 async function submit(){
-  const btn=document.getElementById("nextBtn");
-  btn.textContent="Saving..."; 
-  btn.disabled=true;
+    const btn=document.getElementById("nextBtn");
+    btn.textContent="Saving..."; btn.disabled=true;
+    
+    // Check auth using app.js function
+    const token = await requireAuth();
+    if(!token) return;
 
-  const { data:{user} } = await sb.auth.getUser();
+    const sp=document.querySelector('#promptList .prompt-card.selected');
+    
+    // THE FIX: Naming these exactly what server.js expects
+    const profileBody={
+      first_name: document.getElementById("firstName").value.trim(),
+      dob: document.getElementById("dob").value,
+      gender: document.querySelector('#genderGrid .pill.selected')?.dataset.val,
+      looking_for: document.querySelector('#lookingGrid .pill.selected')?.dataset.val,
+      year: document.getElementById("year").value,
+      major: document.getElementById("major").value,
+      hostel: document.querySelector('#turfGrid .turf-card.selected')?.dataset.val,
+      home_state: document.getElementById("homeState").value,
+      prompt_question: sp?.querySelector('.prompt-q')?.textContent?.trim()||'',
+      prompt_answer: sp?.querySelector('.prompt-ans')?.value?.trim()||'',
+    };
 
-  if(!user){
-    window.location.href="login.html";
-    return;
+    try {
+      // Use the secure API wrapper instead of Supabase SDK directly
+      await api("/api/profile/save", { method: "POST", body: profileBody });
+      window.location.href="/dashboard.html";
+    } catch (error) {
+      alert("Error: " + error.message);
+      btn.textContent="Complete profile →";
+      btn.disabled=false;
+    }
   }
 
   const dob=new Date(document.getElementById("dob").value);
