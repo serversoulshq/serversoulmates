@@ -4,305 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Server Souls — Set up your profile</title>
-  <link rel="icon" href="/unnamed.png" type="image/png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #080810;
-      --surface: #0f0f1a;
-      --surface2: #161624;
-      --surface3: #1c1c2e;
-      --border: rgba(255,255,255,0.07);
-      --border-hover: rgba(255,255,255,0.15);
-      --text: #ede9e4;
-      --muted: #7a7890;
-      --muted2: #4a4860;
-      --accent: #c2607a;
-      --accent-light: #e8859a;
-      --accent-dim: rgba(194,96,122,0.15);
+      --bg: #080810; --surface: #0f0f1a; --surface2: #161624; --surface3: #1c1c2e;
+      --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.15);
+      --text: #ede9e4; --muted: #7a7890; --muted2: #4a4860;
+      --accent: #c2607a; --accent-light: #e8859a; --accent-dim: rgba(194,96,122,0.15);
       --accent-glow: rgba(194,96,122,0.1);
-      --font-display: 'Cormorant Garamond', serif;
-      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Cormorant Garamond', serif; --font-body: 'DM Sans', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: var(--font-body); background: var(--bg); color: var(--text); }
 
-    /* ── Two-panel layout ── */
-    .layout {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ── Left decorative panel ── */
-    .left-panel {
-      position: relative;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 40px 36px;
-      overflow: hidden;
-    }
-    .left-panel::before {
-      content: '';
-      position: absolute;
-      top: -100px; left: -100px;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(194,96,122,0.14) 0%, transparent 65%);
-      animation: driftA 14s ease-in-out infinite alternate;
-    }
-    .left-panel::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; right: -80px;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(90,70,200,0.1) 0%, transparent 65%);
-      animation: driftB 18s ease-in-out infinite alternate;
-    }
+    .layout { display: grid; grid-template-columns: 380px 1fr; height: 100vh; overflow: hidden; }
+    .left-panel { position: relative; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 40px 36px; overflow: hidden; }
+    .left-panel::before { content: ''; position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(194,96,122,0.14) 0%, transparent 65%); animation: driftA 14s ease-in-out infinite alternate; }
+    .left-panel::after { content: ''; position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(90,70,200,0.1) 0%, transparent 65%); animation: driftB 18s ease-in-out infinite alternate; }
     @keyframes driftA { to { transform: translate(40px, 50px); } }
     @keyframes driftB { to { transform: translate(-30px, -40px); } }
 
-    .left-brand {
-      display: flex; align-items: center; gap: 10px;
-      position: relative; z-index: 1;
-    }
-    .left-brand-icon {
-      width: 36px; height: 36px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(194,96,122,0.3);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .left-brand-name {
-      font-family: var(--font-display);
-      font-size: 18px; font-weight: 600;
-      color: var(--text);
-    }
+    .left-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+    .left-brand-icon { width: 36px; height: 36px; background: var(--accent-dim); border: 1px solid rgba(194,96,122,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .left-brand-name { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--text); }
 
-    .left-steps {
-      margin-top: auto;
-      margin-bottom: auto;
-      position: relative; z-index: 1;
-    }
-    .left-step-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 14px 0;
-      position: relative;
-    }
-    .left-step-item:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      left: 15px; top: 44px;
-      width: 1px; height: calc(100% - 14px);
-      background: var(--border);
-    }
-    .step-dot {
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; color: var(--muted);
-      flex-shrink: 0;
-      transition: all 0.35s ease;
-    }
-    .left-step-item.active .step-dot {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      color: var(--accent-light);
-    }
-    .left-step-item.done .step-dot {
-      border-color: rgba(76,175,125,0.5);
-      background: rgba(76,175,125,0.1);
-      color: #4caf7d;
-    }
+    .left-steps { margin-top: auto; margin-bottom: auto; position: relative; z-index: 1; }
+    .left-step-item { display: flex; align-items: flex-start; gap: 16px; padding: 14px 0; position: relative; }
+    .left-step-item:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 44px; width: 1px; height: calc(100% - 14px); background: var(--border); }
+    .step-dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--muted); flex-shrink: 0; transition: all 0.35s ease; }
+    .left-step-item.active .step-dot { border-color: var(--accent); background: var(--accent-dim); color: var(--accent-light); }
+    .left-step-item.done .step-dot { border-color: rgba(76,175,125,0.5); background: rgba(76,175,125,0.1); color: #4caf7d; }
     .left-step-item.done .step-dot::before { content: '✓'; }
     .step-info { padding-top: 4px; }
-    .step-label {
-      font-size: 13px; font-weight: 500;
-      color: var(--muted);
-      transition: color 0.3s;
-    }
+    .step-label { font-size: 13px; font-weight: 500; color: var(--muted); transition: color 0.3s; }
     .left-step-item.active .step-label { color: var(--text); }
     .left-step-item.done .step-label { color: var(--muted); }
-    .step-desc {
-      font-size: 11px; color: var(--muted2);
-      margin-top: 2px; line-height: 1.5;
-    }
+    .step-desc { font-size: 11px; color: var(--muted2); margin-top: 2px; line-height: 1.5; }
     .left-step-item.active .step-desc { color: var(--muted); }
 
-    .left-footer {
-      position: relative; z-index: 1;
-      font-size: 11px; color: var(--muted2);
-      line-height: 1.6;
-    }
+    .left-footer { position: relative; z-index: 1; font-size: 11px; color: var(--muted2); line-height: 1.6; }
     .left-footer span { color: rgba(76,175,125,0.7); }
 
-    /* ── Right form panel ── */
-    .right-panel {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+    .right-panel { display: flex; flex-direction: column; overflow: hidden; }
+    .right-top { padding: 28px 52px 0; flex-shrink: 0; }
+    .progress-track { height: 2px; background: var(--surface3); border-radius: 2px; overflow: visible; position: relative; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 2px; transition: width 0.6s cubic-bezier(0.65,0,0.35,1); position: relative; width: 25%; }
+    .progress-fill::after { content: ''; position: absolute; right: -3px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-light); box-shadow: 0 0 8px var(--accent); }
 
-    /* top strip with progress */
-    .right-top {
-      padding: 28px 52px 0;
-      flex-shrink: 0;
-    }
-    .progress-track {
-      height: 2px;
-      background: var(--surface3);
-      border-radius: 2px;
-      overflow: visible;
-      position: relative;
-    }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-light));
-      border-radius: 2px;
-      transition: width 0.6s cubic-bezier(0.65,0,0.35,1);
-      position: relative;
-      width: 25%;
-    }
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      right: -3px; top: -3px;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--accent-light);
-      box-shadow: 0 0 8px var(--accent);
-    }
-
-    /* scrollable content */
-    .right-content {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 0 52px 24px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surface3) transparent;
-    }
+    .right-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 52px 24px; scrollbar-width: thin; scrollbar-color: var(--surface3) transparent; }
     .right-content::-webkit-scrollbar { width: 4px; }
     .right-content::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
 
-    /* ── Steps ── */
     .step { display: none; }
-    .step.active {
-      display: block;
-      animation: stepIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
-    }
+    .step.active { display: block; animation: stepIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
     .step.leaving { animation: stepOut 0.22s ease-in forwards; }
-    @keyframes stepIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes stepOut {
-      to { opacity: 0; transform: translateY(-16px); }
-    }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes stepOut { to { opacity: 0; transform: translateY(-16px); } }
 
     .step-head { padding-top: 44px; margin-bottom: 36px; }
-    .step-eyebrow {
-      font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent); opacity: 0.75;
-      margin-bottom: 10px;
-    }
-    .step-title {
-      font-family: var(--font-display);
-      font-size: 44px; font-weight: 300; font-style: italic;
-      color: var(--text); line-height: 1.1;
-      margin-bottom: 10px;
-    }
+    .step-eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); opacity: 0.75; margin-bottom: 10px; }
+    .step-title { font-family: var(--font-display); font-size: 44px; font-weight: 300; font-style: italic; color: var(--text); line-height: 1.1; margin-bottom: 10px; }
     .step-title strong { font-weight: 600; font-style: normal; }
     .step-sub { font-size: 14px; color: var(--muted); line-height: 1.65; max-width: 380px; }
 
-    /* ── Fields ── */
     .field { margin-bottom: 22px; }
-    .field label {
-      display: block; font-size: 11px;
-      color: var(--muted); letter-spacing: 0.09em;
-      text-transform: uppercase; margin-bottom: 9px;
-    }
-    .field input[type="text"],
-    .field input[type="date"],
-    .field select {
-      width: 100%; padding: 14px 18px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--text); font-size: 15px;
-      font-family: var(--font-body);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      appearance: none; -webkit-appearance: none;
-    }
+    .field label { display: block; font-size: 11px; color: var(--muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 9px; }
+    .field input[type="text"], .field input[type="date"], .field select { width: 100%; padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; color: var(--text); font-size: 15px; font-family: var(--font-body); outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; appearance: none; -webkit-appearance: none; }
     .field input::placeholder { color: var(--muted2); }
-    .field input:focus,
-    .field select:focus {
-      border-color: rgba(194,96,122,0.5);
-      box-shadow: 0 0 0 4px rgba(194,96,122,0.07);
-      background: var(--surface3);
-    }
-
+    .field input:focus, .field select:focus { border-color: rgba(194,96,122,0.5); box-shadow: 0 0 0 4px rgba(194,96,122,0.07); background: var(--surface3); }
     .field-row { display: grid; gap: 14px; }
     .field-row.two { grid-template-columns: 1fr 1fr; }
 
     .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: '';
-      position: absolute; right: 16px; top: 50%;
-      transform: translateY(-50%);
-      width: 0; height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      border-top: 5px solid var(--muted);
-      pointer-events: none;
-    }
+    .select-wrap::after { content: ''; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid var(--muted); pointer-events: none; }
     .select-wrap select { cursor: pointer; padding-right: 40px; }
     .select-wrap select option { background: #1c1c2e; }
 
-    /* ── Pills ── */
     .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill {
-      padding: 10px 20px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--muted); font-size: 13px;
-      font-family: var(--font-body);
-      cursor: pointer;
-      transition: all 0.18s; user-select: none;
-    }
+    .pill { padding: 10px 20px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 13px; font-family: var(--font-body); cursor: pointer; transition: all 0.18s; user-select: none; }
     .pill:hover { border-color: var(--border-hover); color: var(--text); background: var(--surface3); }
-    .pill.selected {
-      border-color: rgba(194,96,122,0.6);
-      background: var(--accent-dim);
-      color: var(--accent-light);
-    }
+    .pill.selected { border-color: rgba(194,96,122,0.6); background: var(--accent-dim); color: var(--accent-light); }
     .lf-row { display: flex; gap: 8px; }
     .lf-row .pill { flex: 1; text-align: center; }
 
-    /* ── Turf grid ── */
-    .turf-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    .turf-card {
-      padding: 16px 14px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      cursor: pointer; text-align: center;
-      transition: all 0.18s; user-select: none;
-    }
+    .turf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .turf-card { padding: 16px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; cursor: pointer; text-align: center; transition: all 0.18s; user-select: none; }
     .turf-card:hover { border-color: var(--border-hover); background: var(--surface3); }
     .turf-card.selected { border-color: rgba(194,96,122,0.5); background: var(--accent-glow); }
     .turf-icon { font-size: 22px; margin-bottom: 7px; }
@@ -310,136 +97,46 @@
     .turf-sub { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: 0.04em; }
     .turf-card.selected .turf-name { color: var(--accent-light); }
 
-    /* ── Prompt cards ── */
     .prompt-list { display: flex; flex-direction: column; gap: 9px; }
-    .prompt-card {
-      padding: 18px 20px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .prompt-card { padding: 18px 20px; background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; cursor: pointer; transition: all 0.2s; }
     .prompt-card:hover { border-color: var(--border-hover); background: var(--surface3); }
     .prompt-card.selected { border-color: rgba(194,96,122,0.45); background: var(--accent-glow); }
-    .prompt-q {
-      font-family: var(--font-display);
-      font-style: italic; font-size: 18px;
-      color: var(--muted); line-height: 1.4;
-      transition: color 0.2s;
-    }
+    .prompt-q { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--muted); line-height: 1.4; transition: color 0.2s; }
     .prompt-card.selected .prompt-q { color: var(--accent-light); }
-    .prompt-ans-wrap {
-      overflow: hidden; max-height: 0;
-      opacity: 0; transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s;
-      margin-top: 0;
-    }
+    .prompt-ans-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s; margin-top: 0; }
     .prompt-ans-wrap.open { max-height: 100px; opacity: 1; margin-top: 12px; }
-    .prompt-ans {
-      width: 100%; padding: 12px 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text); font-size: 14px;
-      font-family: var(--font-body);
-      outline: none; resize: none;
-      transition: border-color 0.2s;
-    }
+    .prompt-ans { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; font-family: var(--font-body); outline: none; resize: none; transition: border-color 0.2s; }
     .prompt-ans:focus { border-color: rgba(194,96,122,0.4); }
     .prompt-ans::placeholder { color: var(--muted2); }
 
-    /* ── Photo grid ── */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 10px;
-      height: 340px;
-    }
-    .photo-slot {
-      border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,0.1);
-      background: var(--surface2);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      cursor: pointer; position: relative; overflow: hidden;
-      transition: all 0.2s;
-    }
+    .photo-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; height: 340px; }
+    .photo-slot { border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1); background: var(--surface2); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; transition: all 0.2s; }
     .photo-slot:first-child { grid-row: 1 / 3; }
     .photo-slot:hover { border-color: rgba(194,96,122,0.4); background: var(--accent-glow); }
-    .photo-slot img {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
-    }
+    .photo-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .slot-plus { font-size: 20px; opacity: 0.2; margin-bottom: 4px; }
     .slot-lbl { font-size: 10px; color: var(--muted2); letter-spacing: 0.05em; text-transform: uppercase; }
     .photo-slot.main-slot .slot-lbl { color: rgba(194,96,122,0.5); }
-    .remove-x {
-      position: absolute; top: 8px; right: 8px;
-      width: 22px; height: 22px;
-      background: rgba(8,8,16,0.85); border: 1px solid var(--border);
-      border-radius: 50%; font-size: 10px; color: var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; opacity: 0; transition: opacity 0.2s;
-    }
+    .remove-x { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; background: rgba(8,8,16,0.85); border: 1px solid var(--border); border-radius: 50%; font-size: 10px; color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
     .photo-slot:hover .remove-x { opacity: 1; }
     input[type="file"] { display: none; }
     .photo-hint { font-size: 12px; color: var(--muted2); margin-top: 12px; text-align: center; line-height: 1.6; }
 
-    /* ── Bottom nav ── */
-    .right-bottom {
-      padding: 16px 52px 28px;
-      flex-shrink: 0;
-      border-top: 1px solid var(--border);
-      background: rgba(8,8,16,0.6);
-      backdrop-filter: blur(10px);
-      display: flex; gap: 12px;
-    }
-    .btn-back {
-      padding: 14px 22px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--muted); font-size: 14px;
-      font-family: var(--font-body);
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-      flex-shrink: 0;
-    }
+    .right-bottom { padding: 16px 52px 28px; flex-shrink: 0; border-top: 1px solid var(--border); background: rgba(8,8,16,0.6); backdrop-filter: blur(10px); display: flex; gap: 12px; }
+    .btn-back { padding: 14px 22px; background: transparent; border: 1px solid var(--border); border-radius: 14px; color: var(--muted); font-size: 14px; font-family: var(--font-body); cursor: pointer; transition: border-color 0.2s, color 0.2s; flex-shrink: 0; }
     .btn-back:hover { border-color: var(--border-hover); color: var(--text); }
-    .btn-next {
-      flex: 1; padding: 14px 22px;
-      background: var(--accent);
-      border: none; border-radius: 14px;
-      color: white; font-size: 15px; font-weight: 500;
-      font-family: var(--font-body);
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s, opacity 0.2s;
-      letter-spacing: 0.01em;
-    }
+    .btn-next { flex: 1; padding: 14px 22px; background: var(--accent); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 500; font-family: var(--font-body); cursor: pointer; transition: background 0.2s, transform 0.1s, opacity 0.2s; letter-spacing: 0.01em; }
     .btn-next:hover:not(:disabled) { background: var(--accent-light); }
     .btn-next:active:not(:disabled) { transform: scale(0.98); }
     .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
 
-    /* err */
     .err-msg { font-size: 12px; color: #e05c5c; margin-top: 6px; display: none; }
     .err-msg.show { display: block; }
 
-    /* auth guard */
-    #authGuard {
-      position: fixed; inset: 0; background: var(--bg); z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .spinner {
-      width: 30px; height: 30px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    #authGuard { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; align-items: center; justify-content: center; }
+    .spinner { width: 30px; height: 30px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* mobile: collapse left panel */
     @media (max-width: 800px) {
       .layout { grid-template-columns: 1fr; }
       .left-panel { display: none; }
@@ -455,83 +152,55 @@
 <div id="authGuard"><div class="spinner"></div></div>
 
 <div class="layout">
-
-  <!-- ══ LEFT PANEL ══ -->
   <aside class="left-panel">
     <div class="left-brand">
       <div class="left-brand-icon">
-        <img src="Draft_5-modified.png" style="width:20px;height:20px;object-fit:contain;">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 15.5S2 11.2 2 6.5A4.5 4.5 0 0 1 9 3.07 4.5 4.5 0 0 1 16 6.5C16 11.2 9 15.5 9 15.5z" fill="#c2607a"/></svg>
       </div>
       <span class="left-brand-name">Server Souls</span>
     </div>
-
     <div class="left-steps" id="leftSteps">
       <div class="left-step-item active" data-step="1">
         <div class="step-dot">1</div>
-        <div class="step-info">
-          <div class="step-label">The Essentials</div>
-          <div class="step-desc">Name, age & who you're looking for</div>
-        </div>
+        <div class="step-info"><div class="step-label">The Essentials</div><div class="step-desc">Name, age & who you're looking for</div></div>
       </div>
       <div class="left-step-item" data-step="2">
         <div class="step-dot">2</div>
-        <div class="step-info">
-          <div class="step-label">Campus Identity</div>
-          <div class="step-desc">Year, major & where you live on campus</div>
-        </div>
+        <div class="step-info"><div class="step-label">Campus Identity</div><div class="step-desc">Year, major & where you live on campus</div></div>
       </div>
       <div class="left-step-item" data-step="3">
         <div class="step-dot">3</div>
-        <div class="step-info">
-          <div class="step-label">Campus Vibe</div>
-          <div class="step-desc">One icebreaker prompt — make it good</div>
-        </div>
+        <div class="step-info"><div class="step-label">Campus Vibe</div><div class="step-desc">One icebreaker prompt — make it good</div></div>
       </div>
       <div class="left-step-item" data-step="4">
         <div class="step-dot">4</div>
-        <div class="step-info">
-          <div class="step-label">Your Photos</div>
-          <div class="step-desc">Up to 3 photos — first impressions matter</div>
-        </div>
+        <div class="step-info"><div class="step-label">Your Photos</div><div class="step-desc">Up to 3 photos — first impressions matter</div></div>
       </div>
     </div>
-
-    <div class="left-footer">
-      <span>🔒 Verified IISERB only</span> — your profile is only visible to people at your college.
-    </div>
+    <div class="left-footer"><span>🔒 Verified IISERB only</span> — your profile is only visible to people at your college.</div>
   </aside>
 
-  <!-- ══ RIGHT PANEL ══ -->
   <div class="right-panel">
-
     <div class="right-top">
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
     <div class="right-content" id="rightContent">
-
-      <!-- STEP 1 -->
       <div class="step active" id="step1">
         <div class="step-head">
           <div class="step-eyebrow">Step 1 of 4</div>
           <h1 class="step-title">let's start<br>with the basics</h1>
           <p class="step-sub">Just a few things so people know who they're talking to.</p>
         </div>
-
         <div class="field-row two" style="margin-bottom:22px">
           <div class="field" style="margin-bottom:0">
-            <label>First name</label>
-            <input type="text" id="firstName" placeholder="Your name" oninput="v1()" />
+            <label>First name</label><input type="text" id="firstName" placeholder="Your name" oninput="v1()" />
           </div>
           <div class="field" style="margin-bottom:0">
-            <label>Date of birth</label>
-            <input type="date" id="dob" onchange="v1()" />
+            <label>Date of birth</label><input type="date" id="dob" onchange="v1()" />
             <div class="err-msg" id="dobErr">Must be 18+ to join.</div>
           </div>
         </div>
-
         <div class="field">
           <label>I am a</label>
           <div class="pill-row" id="genderGrid">
@@ -541,7 +210,6 @@
             <div class="pill" data-val="Other" onclick="pickPill('genderGrid',this);v1()">Other</div>
           </div>
         </div>
-
         <div class="field">
           <label>Looking for</label>
           <div class="pill-row lf-row" id="lookingGrid">
@@ -552,23 +220,20 @@
         </div>
       </div>
 
-      <!-- STEP 2 -->
       <div class="step" id="step2">
         <div class="step-head">
           <div class="step-eyebrow">Step 2 of 4</div>
           <h1 class="step-title">your campus<br>identity</h1>
           <p class="step-sub">Help people place you in the IISERB ecosystem.</p>
         </div>
-
         <div class="field-row two" style="margin-bottom:22px">
           <div class="field" style="margin-bottom:0">
             <label>Year</label>
             <div class="select-wrap">
               <select id="year" onchange="v2()">
                 <option value="" disabled selected>Your year</option>
-                <option>1st Year</option><option>2nd Year</option>
-                <option>3rd Year</option><option>4th Year</option>
-                <option>5th Year</option><option>PhD</option>
+                <option>1st Year</option><option>2nd Year</option><option>3rd Year</option>
+                <option>4th Year</option><option>5th Year</option><option>PhD</option>
               </select>
             </div>
           </div>
@@ -577,109 +242,57 @@
             <div class="select-wrap">
               <select id="major" onchange="v2()">
                 <option value="" disabled selected>What you study</option>
-                <option>Natural Sciences</option>
-                <option>B.Tech</option>
-                <option>Biology</option>
-                <option>Chemistry</option>
-                <option>Physics</option>
-                <option>Mathematics</option>
-                <option>Computer Science</option>
+                <option>Natural Sciences (1st Year)</option><option>B.Tech (1st Year)</option>
+                <option>Biology</option><option>Chemistry</option><option>Physics</option>
+                <option>Mathematics</option><option>Computer Science</option>
                 <option>Earth &amp; Environmental Sciences</option>
-                <option>Humanities &amp; Social Sciences</option>
-                <option>Economics</option>
-                <option>Data Science</option>
+                <option>Humanities &amp; Social Sciences</option><option>Economics</option><option>Data Science</option>
               </select>
             </div>
           </div>
         </div>
-
         <div class="field" style="margin-bottom:22px">
           <label>Home State</label>
           <div class="select-wrap">
             <select id="homeState" onchange="v2()">
               <option value="" disabled selected>Where are you from?</option>
-              <option>Andhra Pradesh</option>
-              <option>Arunachal Pradesh</option>
-              <option>Assam</option>
-              <option>Bihar</option>
-              <option>Chhattisgarh</option>
-              <option>Goa</option>
-              <option>Gujarat</option>
-              <option>Haryana</option>
-              <option>Himachal Pradesh</option>
-              <option>Jharkhand</option>
-              <option>Karnataka</option>
-              <option>Kerala</option>
-              <option>Madhya Pradesh</option>
-              <option>Maharashtra</option>
-              <option>Manipur</option>
-              <option>Meghalaya</option>
-              <option>Mizoram</option>
-              <option>Nagaland</option>
-              <option>Odisha</option>
-              <option>Punjab</option>
-              <option>Rajasthan</option>
-              <option>Sikkim</option>
-              <option>Tamil Nadu</option>
-              <option>Telangana</option>
-              <option>Tripura</option>
-              <option>Uttar Pradesh</option>
-              <option>Uttarakhand</option>
-              <option>West Bengal</option>
-              <option>Andaman &amp; Nicobar Islands</option>
-              <option>Chandigarh</option>
-              <option>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option>
-              <option>Delhi</option>
-              <option>Jammu &amp; Kashmir</option>
-              <option>Ladakh</option>
-              <option>Lakshadweep</option>
-              <option>Puducherry</option>
+              <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+              <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option>
+              <option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option>
+              <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
+              <option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option>
+              <option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+              <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+              <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option>
+              <option>Uttarakhand</option><option>West Bengal</option><option>Andaman &amp; Nicobar Islands</option>
+              <option>Chandigarh</option><option>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option>
+              <option>Delhi</option><option>Jammu &amp; Kashmir</option><option>Ladakh</option>
+              <option>Lakshadweep</option><option>Puducherry</option>
             </select>
           </div>
         </div>
-
         <div class="field">
           <label>Campus turf</label>
           <div class="turf-grid" id="turfGrid">
-            <div class="turf-card" data-val="Hostel 1" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 1</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 2" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 2</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 3" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 3</div><div class="turf-sub">Girls</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 4" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 4</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 5" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 5</div><div class="turf-sub">Girls</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 6" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 6</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 7" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 7</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 8" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 8</div><div class="turf-sub">Boys</div>
-            </div>
-            <div class="turf-card" data-val="Hostel 9" onclick="pickTurf(this);v2()">
-              <div class="turf-icon">🏠</div><div class="turf-name">Hostel 9</div><div class="turf-sub">Girls</div>
-            </div>
+            <div class="turf-card" data-val="Hostel 1" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 1</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 2" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 2</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 3" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 3</div><div class="turf-sub">Girls</div></div>
+            <div class="turf-card" data-val="Hostel 4" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 4</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 5" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 5</div><div class="turf-sub">Girls</div></div>
+            <div class="turf-card" data-val="Hostel 6" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 6</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 7" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 7</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 8" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 8</div><div class="turf-sub">Boys</div></div>
+            <div class="turf-card" data-val="Hostel 9" onclick="pickTurf(this);v2()"><div class="turf-icon">🏠</div><div class="turf-name">Hostel 9</div><div class="turf-sub">Girls</div></div>
           </div>
         </div>
       </div>
 
-      <!-- STEP 3 -->
       <div class="step" id="step3">
         <div class="step-head">
           <div class="step-eyebrow">Step 3 of 4</div>
           <h1 class="step-title">your campus<br>vibe</h1>
           <p class="step-sub">Pick one prompt. Your answer becomes your conversation starter — make it real.</p>
         </div>
-
         <div class="prompt-list" id="promptList">
           <div class="prompt-card" onclick="pickPrompt(this)">
             <div class="prompt-q">My go-to survival meal during finals is...</div>
@@ -700,286 +313,13 @@
         </div>
       </div>
 
-      <!-- STEP 4 -->
       <div class="step" id="step4">
         <div class="step-head">
           <div class="step-eyebrow">Step 4 of 4</div>
           <h1 class="step-title">show your<br>face</h1>
           <p class="step-sub">At least one photo. Up to three. Keep it real.</p>
         </div>
-
         <div class="photo-grid">
-          <div class="photo-slot main-slot" id="slot0" onclick="doUpload(0)">
-            <div class="slot-plus">＋</div>
-            <div class="slot-lbl">Main photo</div>
-            <div class="remove-x" onclick="rmPhoto(event,0)">✕</div>
-          </div>
-          <div class="photo-slot" id="slot1" onclick="doUpload(1)">
-            <div class="slot-plus">＋</div>
-            <div class="slot-lbl">Photo 2</div>
-            <div class="remove-x" onclick="rmPhoto(event,1)">✕</div>
-          </div>
-          <div class="photo-slot" id="slot2" onclick="doUpload(2)">
-            <div class="slot-plus">＋</div>
-            <div class="slot-lbl">Photo 3</div>
-            <div class="remove-x" onclick="rmPhoto(event,2)">✕</div>
-          </div>
-        </div>
-        <input type="file" id="fi0" accept="image/*" onchange="gotPhoto(event,0)"/>
-        <input type="file" id="fi1" accept="image/*" onchange="gotPhoto(event,1)"/>
-        <input type="file" id="fi2" accept="image/*" onchange="gotPhoto(event,2)"/>
-        <p class="photo-hint">Only visible to verified IISERB students · First photo is your profile picture</p>
-      </div>
-
-    </div><!-- /right-content -->
-
-    <div class="right-bottom">
-      <button class="btn-back" id="backBtn" onclick="goBack()" style="display:none">← Back</button>
-      <button class="btn-next" id="nextBtn" onclick="goNext()" disabled>Continue →</button>
-    </div>
-
-  </div><!-- /right-panel -->
-
-</div><!-- /layout -->
-<script src="/app.js"></script>
-<script>
-  let cur = 1;
-  const TOTAL = 4;
-  let photos = [null,null,null];
-
-  async function init() {
-    // We now use app.js to check authentication securely
-    const token = await requireAuth();
-    if (!token) return; 
-    
-    // This hides the spinner!
-    document.getElementById("authGuard").style.display="none";
-
-    // DOB limits: must be 18–35 years old (blocks trolling with year 1900 etc.)
-    const now = new Date();
-    const maxDate = new Date(now.getFullYear()-18, now.getMonth(), now.getDate());
-    const minDate = new Date(now.getFullYear()-35, now.getMonth(), now.getDate());
-    const dobEl = document.getElementById("dob");
-    dobEl.max = maxDate.toISOString().split('T')[0];
-    dobEl.min = minDate.toISOString().split('T')[0];
-
-    syncUI();
-  }
-
-  function syncUI() {
-    // progress bar
-    document.getElementById("progressFill").style.width = (cur/TOTAL*100)+"%";
-    // back button
-    document.getElementById("backBtn").style.display = cur > 1 ? "block" : "none";
-    // next button text
-    document.getElementById("nextBtn").textContent = cur===TOTAL ? "Complete profile →" : "Continue →";
-    // left sidebar steps
-    document.querySelectorAll('.left-step-item').forEach(el => {
-      const s = +el.dataset.step;
-      el.classList.toggle('active', s===cur);
-      el.classList.toggle('done', s<cur);
-      if (s < cur) el.querySelector('.step-dot').textContent = '';
-      else if (s > cur) el.querySelector('.step-dot').textContent = s;
-    });
-  }
-
-  function pickPill(gridId, el) {
-    document.querySelectorAll(`#${gridId} .pill`).forEach(p=>p.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  function pickTurf(el) {
-    document.querySelectorAll('#turfGrid .turf-card').forEach(c=>c.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  function pickPrompt(el) {
-    document.querySelectorAll('#promptList .prompt-card').forEach(c=>{
-      c.classList.remove('selected');
-      c.querySelector('.prompt-ans-wrap').classList.remove('open');
-    });
-    el.classList.add('selected');
-    el.querySelector('.prompt-ans-wrap').classList.add('open');
-    setTimeout(()=>el.querySelector('.prompt-ans').focus(), 50);
-    v3();
-  }
-
-  // photo upload
-  function doUpload(i) { document.getElementById(`fi${i}`).click(); }
-  function gotPhoto(e,i) {
-    const f=e.target.files[0]; if(!f) return;
-    photos[i]={file:f, url:URL.createObjectURL(f)};
-    const slot=document.getElementById(`slot${i}`);
-    slot.querySelector('img')?.remove();
-    const img=document.createElement('img'); img.src=photos[i].url; img.alt='';
-    slot.prepend(img);
-    slot.querySelector('.slot-plus').style.display='none';
-    slot.querySelector('.slot-lbl').style.display='none';
-    v4();
-  }
-  function rmPhoto(e,i) {
-    e.stopPropagation(); photos[i]=null;
-    const slot=document.getElementById(`slot${i}`);
-    slot.querySelector('img')?.remove();
-    slot.querySelector('.slot-plus').style.display='';
-    slot.querySelector('.slot-lbl').style.display='';
-    document.getElementById(`fi${i}`).value='';
-    v4();
-  }
-
-  // validators
-  function nb(ok){document.getElementById("nextBtn").disabled=!ok;}
-  function v1() {
-    const name=document.getElementById("firstName").value.trim();
-    const dob=document.getElementById("dob").value;
-    const g=document.querySelector('#genderGrid .pill.selected');
-    const lf=document.querySelector('#lookingGrid .pill.selected');
-    const errEl=document.getElementById("dobErr");
-    let dobOk=false;
-    if(dob){
-      const age=Math.floor((Date.now()-new Date(dob))/(365.25*86400000));
-      dobOk=age>=18;
-      errEl.classList.toggle('show',!dobOk);
-    }
-    nb(name.length>=2 && dobOk && !!g && !!lf);
-  }
-  function v2(){
-    const yr=document.getElementById("year").value;
-    const mj=document.getElementById("major").value;
-    const st=document.getElementById("homeState").value;
-    const tf=document.querySelector('#turfGrid .turf-card.selected');
-    nb(!!yr&&!!mj&&!!st&&!!tf);
-  }
-  function v3(){
-    const sel=document.querySelector('#promptList .prompt-card.selected');
-    if(!sel){nb(false);return;}
-    nb(sel.querySelector('.prompt-ans').value.trim().length>=5);
-  }
-  function v4(){nb(!!photos[0]);}
-
-  function goBack(){if(cur>1)go(cur,cur-1);}
-  function goNext(){if(cur<TOTAL)go(cur,cur+1);else submit();}
-
-  function go(from,to){
-    const fe=document.getElementById(`step${from}`);
-    const te=document.getElementById(`step${to}`);
-    fe.classList.add('leaving');
-    setTimeout(()=>{
-      fe.classList.remove('active','leaving');
-      te.classList.add('active');
-      cur=to; nb(false); syncUI();
-      document.getElementById('rightContent').scrollTop=0;
-      if(to===2)v2(); if(to===3)v3(); if(to===4)v4();
-    },200);
-  }
-
-async function submit(){
-    const btn=document.getElementById("nextBtn");
-    btn.textContent="Saving..."; btn.disabled=true;
-    
-    // Check auth using app.js function
-    const token = await requireAuth();
-    if(!token) return;
-
-    const sp=document.querySelector('#promptList .prompt-card.selected');
-    
-    // THE FIX: Naming these exactly what server.js expects
-    const profileBody={
-      first_name: document.getElementById("firstName").value.trim(),
-      dob: document.getElementById("dob").value,
-      gender: document.querySelector('#genderGrid .pill.selected')?.dataset.val,
-      looking_for: document.querySelector('#lookingGrid .pill.selected')?.dataset.val,
-      year: document.getElementById("year").value,
-      major: document.getElementById("major").value,
-      hostel: document.querySelector('#turfGrid .turf-card.selected')?.dataset.val,
-      home_state: document.getElementById("homeState").value,
-      prompt_question: sp?.querySelector('.prompt-q')?.textContent?.trim()||'',
-      prompt_answer: sp?.querySelector('.prompt-ans')?.value?.trim()||'',
-    };
-
-    try {
-      // Use the secure API wrapper instead of Supabase SDK directly
-      await api("/api/profile/save", { method: "POST", body: profileBody });
-      window.location.href="/dashboard.html";
-    } catch (error) {
-      alert("Error: " + error.message);
-      btn.textContent="Complete profile →";
-      btn.disabled=false;
-    }
-  }
-
-  const dob=new Date(document.getElementById("dob").value);
-  const age=Math.floor((Date.now()-dob)/(365.25*86400000));
-
-  const sp=document.querySelector('#promptList .prompt-card.selected');
-
-// 🔥 UPLOAD IMAGES FIRST
-const imageUrls = [];
-
-for (let i = 0; i < photos.length; i++) {
-  if (!photos[i]) {
-    imageUrls.push(null);
-    continue;
-  }
-
-  const file = photos[i].file;
-
-  const filePath = `${user.id}/${Date.now()}_${i}.jpg`;
-
-  const { error: uploadError } = await sb.storage
-    .from('profile_images')
-    .upload(filePath, file);
-
-if (uploadError) {
-  console.error("UPLOAD ERROR FULL:", uploadError);
-  alert("Upload failed: " + uploadError.message);
-  return;
-}
-
-  const { data: publicUrlData } = sb.storage
-    .from('profile_images')
-    .getPublicUrl(filePath);
-
-  imageUrls.push(publicUrlData.publicUrl);
-}
-  
-  const profile={
-    user_id:user.id,
-    first_name:document.getElementById("firstName").value.trim(),
-    age,
-    gender:document.querySelector('#genderGrid .pill.selected')?.dataset.val,
-    looking_for:document.querySelector('#lookingGrid .pill.selected')?.dataset.val,
-    year:document.getElementById("year").value,
-    major:document.getElementById("major").value,
-    campus_turf:document.querySelector('#turfGrid .turf-card.selected')?.dataset.val,
-    home_state:document.getElementById("homeState").value,
-    prompt_q:sp?.querySelector('.prompt-q')?.textContent?.trim()||'',
-    prompt_a:sp?.querySelector('.prompt-ans')?.value?.trim()||'',
-    image_1: imageUrls[0],
-    image_2: imageUrls[1],
-    image_3: imageUrls[2]
-  };
-
-  // 🔥 ADD DEBUG HERE
-  console.log("AUTH USER:", user);
-  console.log("AUTH UID:", user.id);
-  console.log("PROFILE USER_ID:", profile.user_id);
-
-  // 🔥 THEN YOUR INSERT
-  const {error}=await sb
-    .from('participants')
-    .upsert([profile],{onConflict:'user_id'});
-
-  if(error){
-    console.error("RLS ERROR:", error);
-    alert("Error: "+error.message);
-    btn.textContent="Complete profile →";
-    btn.disabled=false;
-    return;
-  }
-
-  window.location.href="dashboard.html";
-}
-
-  init();
-</script>
-</body>
-</html>
+          <div class="photo-slot main-slot" id="slot0" onclick="doUpload(0)"><div class="slot-plus">＋</div><div class="slot-lbl">Main photo</div><div class="remove-x" onclick="rmPhoto(event,0)">✕</div></div>
+          <div class="photo-slot" id="slot1" onclick="doUpload(1)"><div class="slot-plus">＋</div><div class="slot-lbl">Photo 2</div><div class="remove-x" onclick="rmPhoto(event,1)">✕</div></div>
+          <div class="photo-slot" id="slot2" onclick="doUpload(2)"><div class="slot-plus">＋</div><div class="slot-lbl">Photo 3</div><div class="remove-x
