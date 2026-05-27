@@ -149,7 +149,11 @@ app.get("/api/discover", auth, async (req, res) => {
   let query = sb
     .from("profiles")
     .select("id, first_name, dob, gender, year, major, hostel, home_state, prompt_question, prompt_answer, photos(url, position)")
-    .not("id", "in", `(${swipedIds.join(",")})`)
+    .not(
+      "id",
+      "in",
+      `(${swipedIds.map(id => `"${id}"`).join(",")})`
+    )
     .limit(20);
 
   if (genderFilter) query = query.eq("gender", genderFilter);
@@ -164,6 +168,9 @@ app.get("/api/discover", auth, async (req, res) => {
     photos: (p.photos || []).sort((a, b) => a.position - b.position)
   }));
 
+  console.log("DISCOVER RESULTS:", profiles.length);
+  console.log(profiles);
+  
   res.json(profiles);
 });
 
