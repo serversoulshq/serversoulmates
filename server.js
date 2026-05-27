@@ -317,6 +317,38 @@ app.post("/api/messages/:matchId", auth, async (req, res) => {
   res.json(data);
 });
 
+// ── Add this route to server.js, just before the page routes section ──
+
+// Who liked the current user (for sidebar)
+app.get("/api/liked-you", auth, async (req, res) => {
+  const uid = req.user.id;
+
+  // People who liked me that I haven't swiped back yet
+  const { data: likers, error } = await sb
+    .from("swipes")
+    .select("swiper")
+    .eq("swiped", uid)
+    .eq("is_like", true);
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const likerIds = (likers || []).map(l => l.swiper);
+  if (!likerIds.length) return res.json([]);
+
+  const { data: profiles } = await sb
+    .from("profiles")
+    .select("id, first_name, dob, hostel, photos(url, position)")
+    .in("id", likerIds)
+    .limit(10);
+
+  const result = (profiles || []).map(p => ({
+    ...p,
+    age: p.dob ? Math.floor((Date.now() - new Date(p.dob)) / (365.25 * 86400000)) : null,
+    photos: (p.photos || []).sort((a, b) => a.position - b.position)
+  }));
+
+  res.json(result);
+});
 // ════════════════════════════════════════════
 //  PAGE ROUTES
 // ════════════════════════════════════════════
