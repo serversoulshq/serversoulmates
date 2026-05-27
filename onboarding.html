@@ -891,9 +891,15 @@ async function submit(){
   const sp=document.querySelector('#promptList .prompt-card.selected');
 
 // 🔥 UPLOAD IMAGES FIRST
+await sb
+  .from("photos")
+  .delete()
+  .eq("user_id", user.id);
+
 const imageUrls = [];
 
 for (let i = 0; i < photos.length; i++) {
+
   if (!photos[i]) {
     imageUrls.push(null);
     continue;
@@ -903,21 +909,39 @@ for (let i = 0; i < photos.length; i++) {
 
   const filePath = `${user.id}/${Date.now()}_${i}.jpg`;
 
+  // upload to storage
   const { error: uploadError } = await sb.storage
     .from('profile_images')
-    .upload(filePath, file);
+    .upload(filePath, file, {
+      upsert: true
+    });
 
-if (uploadError) {
-  console.error("UPLOAD ERROR FULL:", uploadError);
-  alert("Upload failed: " + uploadError.message);
-  return;
-}
+  if (uploadError) {
+    console.error(uploadError);
+    continue;
+  }
 
+  // get public url
   const { data: publicUrlData } = sb.storage
     .from('profile_images')
     .getPublicUrl(filePath);
 
-  imageUrls.push(publicUrlData.publicUrl);
+  const publicUrl = publicUrlData.publicUrl;
+
+  imageUrls.push(publicUrl);
+
+  // 🔥 INSERT INTO photos TABLE
+  const { error: photoError } = await sb
+    .from("photos")
+    .insert({
+      user_id: user.id,
+      url: publicUrl,
+      position: i
+    });
+
+  if (photoError) {
+    console.error(photoError);
+  }
 }
   
   const profile={
