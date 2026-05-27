@@ -5,463 +5,929 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Souls — Discover</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #080810; --surface: #10101c; --surface2: #161624; --surface3: #1c1c2e;
-      --border: rgba(255,255,255,0.07); --text: #ede9e4; --muted: #7a7890;
-      --accent: #c2607a; --accent-light: #e8859a; --accent-glow: rgba(194,96,122,0.18);
-      --like: #4caf7d; --skip: #e05c5c;
-      --font-display: 'Cormorant Garamond', serif; --font-body: 'DM Sans', sans-serif;
+      --bg: #080810;
+      --surface: #10101c;
+      --surface2: #161624;
+      --surface3: #1c1c2e;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.13);
+      --text: #ede9e4;
+      --muted: #7a7890;
+      --muted2: #4a4860;
+      --accent: #c2607a;
+      --accent-light: #e8859a;
+      --accent-glow: rgba(194,96,122,0.18);
+      --accent-dim: rgba(194,96,122,0.1);
+      --gold: #d4a843;
+      --gold-glow: rgba(212,168,67,0.2);
+      --like: #4caf7d;
+      --like-glow: rgba(76,175,125,0.2);
+      --skip: #e05c5c;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --nav-w: 220px;
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: var(--font-body); background: var(--bg); color: var(--text); overflow: hidden; }
 
-    .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(90px); }
-    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(194,96,122,0.1), transparent 70%); top: -120px; left: -100px; animation: da 16s ease-in-out infinite alternate; }
-    .orb-2 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(80,60,180,0.08), transparent 70%); bottom: -80px; right: -60px; animation: db 20s ease-in-out infinite alternate; }
-    @keyframes da { to { transform: translate(50px,60px); } }
-    @keyframes db { to { transform: translate(-40px,-50px); } }
+    /* ── Ambient orbs ── */
+    .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(100px); z-index: 0; }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(194,96,122,0.1), transparent 70%); top: -150px; left: 160px; animation: da 18s ease-in-out infinite alternate; }
+    .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(80,60,180,0.08), transparent 70%); bottom: -100px; right: 200px; animation: db 22s ease-in-out infinite alternate; }
+    @keyframes da { to { transform: translate(60px, 80px); } }
+    @keyframes db { to { transform: translate(-60px, -60px); } }
 
-    /* ── Nav ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 28px; height: 60px;
-      background: rgba(8,8,16,0.85); backdrop-filter: blur(14px);
+    /* ── Layout shell ── */
+    .shell {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: var(--nav-w) 1fr 280px;
+      grid-template-rows: 100vh;
+      height: 100vh;
+    }
+
+    /* ════════════════════════════════
+       LEFT SIDEBAR NAV
+    ════════════════════════════════ */
+    .sidebar {
+      display: flex; flex-direction: column;
+      padding: 28px 16px;
+      border-right: 1px solid var(--border);
+      background: rgba(8,8,16,0.6);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 8px 28px;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      text-decoration: none;
     }
-    .nav-brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
-    .nav-logo { width: 32px; height: 32px; background: var(--accent-glow); border: 1px solid rgba(194,96,122,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .nav-logo img { width: 100%; height: 100%; object-fit: cover; }
-    .nav-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--text); }
-    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .brand-logo {
+      width: 36px; height: 36px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(194,96,122,0.3);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-text { }
+    .brand-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.1; }
+    .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; }
+
+    .nav-links { display: flex; flex-direction: column; gap: 2px; flex: 1; }
     .nav-link {
-      padding: 7px 14px; border-radius: 8px; text-decoration: none;
-      font-size: 13px; color: var(--muted);
-      transition: color 0.2s, background 0.2s;
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center; gap: 11px;
+      padding: 10px 12px; border-radius: 10px;
+      text-decoration: none; color: var(--muted);
+      font-size: 13px; font-weight: 400;
+      transition: all 0.2s; position: relative;
     }
-    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-link.active { color: var(--accent-light); background: var(--accent-glow); }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-link.active { color: var(--accent-light); background: var(--accent-dim); }
+    .nav-link .icon { width: 18px; text-align: center; flex-shrink: 0; }
     .nav-link .badge {
-      background: var(--accent); color: white; font-size: 10px;
-      padding: 1px 6px; border-radius: 10px; font-weight: 500;
+      margin-left: auto; min-width: 18px; height: 18px;
+      background: var(--accent); color: white;
+      font-size: 10px; font-weight: 600;
+      border-radius: 9px; padding: 0 5px;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    /* ── Main layout ── */
-    .main {
-      position: fixed; inset: 60px 0 0 0;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px 16px;
+    .nav-divider { height: 1px; background: var(--border); margin: 10px 0; }
+
+    .sidebar-bottom { margin-top: auto; }
+    .likes-left-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
+    .likes-left-label { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .likes-bar-wrap { height: 4px; background: var(--surface3); border-radius: 2px; margin-bottom: 6px; }
+    .likes-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); transition: width 0.4s ease; }
+    .likes-count { font-size: 12px; color: var(--muted); }
+    .likes-count span { color: var(--accent-light); font-weight: 500; }
+
+    .signout-btn {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 12px; border-radius: 10px; width: 100%;
+      background: transparent; border: none;
+      color: var(--muted); font-size: 13px; font-family: var(--font-body);
+      cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    .signout-btn:hover { color: var(--skip); background: rgba(224,92,92,0.06); }
+
+    /* ════════════════════════════════
+       MAIN CONTENT
+    ════════════════════════════════ */
+    .main {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px; overflow: hidden; position: relative;
+    }
+
+    .main-header {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 22px 28px 0;
+      display: flex; align-items: baseline; gap: 10px;
+    }
+    .main-title { font-family: var(--font-display); font-size: 28px; font-style: italic; font-weight: 300; color: var(--text); }
+    .main-title strong { font-weight: 600; font-style: normal; }
+    .main-sub { font-size: 12px; color: var(--muted); }
 
     /* ── Card stack ── */
-    .stack-wrap { position: relative; width: 340px; }
+    .card-area { display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+
+    .stack-wrap { position: relative; width: 320px; }
+
+    /* shadow cards */
     .shadow-card {
       position: absolute; border-radius: 22px;
       background: var(--surface2); border: 1px solid var(--border);
       left: 50%; transform: translateX(-50%);
+      transition: all 0.3s ease;
     }
-    .shadow-1 { width: 92%; height: calc(100% - 10px); top: -10px; opacity: 0.5; }
-    .shadow-2 { width: 84%; height: calc(100% - 20px); top: -20px; opacity: 0.25; }
+    .shadow-1 { width: 93%; height: calc(100% - 8px); top: -10px; opacity: 0.5; z-index: 0; }
+    .shadow-2 { width: 86%; height: calc(100% - 16px); top: -19px; opacity: 0.25; z-index: -1; }
 
-    .card {
+    /* main card */
+    .swipe-card {
       position: relative; z-index: 2;
-      width: 100%; border-radius: 22px; overflow: hidden;
+      width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
-      box-shadow: 0 28px 64px rgba(0,0,0,0.55);
-      user-select: none;
-      transition: transform 0.08s ease;
+      border-radius: 22px; overflow: hidden;
+      box-shadow: 0 32px 72px rgba(0,0,0,0.6);
+      cursor: grab; user-select: none;
+      will-change: transform;
     }
-    .card.animate-in { animation: cardIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes cardIn { from { opacity:0; transform:scale(0.92) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
-    .card.fly-right { animation: flyR 0.38s cubic-bezier(0.4,0,1,1) forwards; }
-    .card.fly-left  { animation: flyL 0.38s cubic-bezier(0.4,0,1,1) forwards; }
-    @keyframes flyR { to { transform: translateX(160%) rotate(20deg); opacity:0; } }
-    @keyframes flyL { to { transform: translateX(-160%) rotate(-20deg); opacity:0; } }
+    .swipe-card:active { cursor: grabbing; }
+    .swipe-card.is-animating { transition: transform 0.08s ease; }
+    .swipe-card.fly-right { animation: flyRight 0.4s cubic-bezier(0.4,0,1,1) forwards !important; transition: none !important; }
+    .swipe-card.fly-left  { animation: flyLeft  0.4s cubic-bezier(0.4,0,1,1) forwards !important; transition: none !important; }
+    .swipe-card.card-in   { animation: cardIn   0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+    @keyframes flyRight { to { transform: translateX(160%) rotate(22deg); opacity: 0; } }
+    @keyframes flyLeft  { to { transform: translateX(-160%) rotate(-22deg); opacity: 0; } }
+    @keyframes cardIn   { from { opacity: 0; transform: scale(0.92) translateY(18px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-    /* drag indicators */
-    .like-stamp, .nope-stamp {
-      position: absolute; top: 28px; padding: 6px 14px;
-      border-radius: 8px; font-size: 22px; font-weight: 700;
-      letter-spacing: 0.05em; z-index: 10; opacity: 0;
-      pointer-events: none; transition: opacity 0.1s;
-      font-family: var(--font-display);
+    /* stamp overlays */
+    .stamp {
+      position: absolute; z-index: 10; top: 28px;
+      padding: 6px 14px; border-radius: 8px;
+      font-family: var(--font-display); font-size: 26px; font-weight: 700;
+      letter-spacing: 0.04em; pointer-events: none;
+      opacity: 0; transition: opacity 0.1s;
     }
-    .like-stamp { left: 24px; color: var(--like); border: 3px solid var(--like); transform: rotate(-15deg); }
-    .nope-stamp { right: 24px; color: var(--skip); border: 3px solid var(--skip); transform: rotate(15deg); }
+    .stamp-like { left: 22px; color: var(--like); border: 3px solid var(--like); transform: rotate(-14deg); }
+    .stamp-nope { right: 22px; color: var(--skip); border: 3px solid var(--skip); transform: rotate(14deg); }
 
     /* photo area */
-    .card-photos { position: relative; height: 400px; overflow: hidden; }
-    .card-photos img {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; opacity: 0; transition: opacity 0.3s;
-    }
-    .card-photos img.visible { opacity: 1; }
+    .card-photos { position: relative; height: 380px; overflow: hidden; background: var(--surface2); }
+    .card-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.35s ease; }
+    .card-photo.visible { opacity: 1; }
     .card-photos::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(8,8,16,1) 0%, rgba(8,8,16,0.5) 45%, transparent 75%);
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to top, rgba(8,8,16,1) 0%, rgba(8,8,16,0.55) 42%, transparent 72%);
     }
+
+    /* photo nav zones */
+    .photo-zone { position: absolute; top: 0; bottom: 0; width: 42%; z-index: 3; cursor: pointer; }
+    .photo-zone-prev { left: 0; }
+    .photo-zone-next { right: 0; }
 
     /* photo dots */
     .photo-dots {
-      position: absolute; top: 12px; left: 12px; right: 12px;
-      display: flex; gap: 4px; z-index: 5;
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; gap: 4px; z-index: 4; pointer-events: none;
     }
-    .photo-dot {
-      flex: 1; height: 3px; border-radius: 2px;
-      background: rgba(255,255,255,0.3); cursor: pointer;
-      transition: background 0.2s;
-    }
+    .photo-dot { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.28); transition: background 0.2s; }
     .photo-dot.active { background: white; }
 
-    /* tap zones */
-    .tap-prev, .tap-next {
-      position: absolute; top: 0; bottom: 0; width: 45%; z-index: 4; cursor: pointer;
+    /* card info overlay */
+    .card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 0 18px 18px; z-index: 5; }
+    .card-name { font-family: var(--font-display); font-size: 30px; font-weight: 600; font-style: italic; line-height: 1.1; margin-bottom: 5px; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .card-tag {
+      padding: 3px 9px; border-radius: 20px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      font-size: 11px; color: rgba(237,233,228,0.7);
     }
-    .tap-prev { left: 0; }
-    .tap-next { right: 0; }
-
-    /* card info */
-    .card-info {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 22px 22px 20px; z-index: 5;
+    .card-prompt {
+      background: rgba(8,8,16,0.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-left: 2px solid var(--accent);
+      border-radius: 0 8px 8px 0; padding: 10px 12px;
     }
-    .card-name { font-family: var(--font-display); font-size: 32px; font-weight: 600; font-style: italic; line-height: 1.1; margin-bottom: 4px; }
-    .card-meta { font-size: 13px; color: rgba(237,233,228,0.65); margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-    .card-meta span {
-      padding: 2px 9px; border-radius: 20px;
-      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-      font-size: 11px;
-    }
-    .card-prompt { margin-top: 8px; padding: 12px 14px; background: rgba(255,255,255,0.05); border-radius: 10px; border-left: 2px solid var(--accent); }
-    .card-prompt-q { font-size: 11px; color: var(--accent-light); opacity: 0.7; margin-bottom: 4px; letter-spacing: 0.04em; }
-    .card-prompt-a { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--text); line-height: 1.45; }
+    .card-prompt-q { font-size: 10px; color: var(--accent-light); opacity: 0.75; margin-bottom: 3px; letter-spacing: 0.04em; }
+    .card-prompt-a { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--text); line-height: 1.45; }
 
     /* ── Action buttons ── */
-    .actions {
-      position: relative; z-index: 3;
-      display: flex; gap: 14px; justify-content: center; margin-top: 24px;
-    }
+    .actions { display: flex; gap: 18px; align-items: center; margin-top: 22px; }
     .action-btn {
-      width: 58px; height: 58px; border-radius: 50%; border: none;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 22px;
-      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
     }
-    .action-btn:active { transform: scale(0.87) !important; }
-    .btn-skip { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-    .btn-skip:hover { transform: scale(1.1) rotate(-8deg); color: var(--skip); border-color: rgba(224,92,92,0.3); }
-    .btn-like { background: var(--accent); color: white; box-shadow: 0 6px 24px rgba(194,96,122,0.45); }
-    .btn-like:hover { transform: scale(1.1) rotate(8deg); background: var(--accent-light); box-shadow: 0 8px 30px rgba(194,96,122,0.65); }
-    .btn-info { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); box-shadow: 0 4px 16px rgba(0,0,0,0.3); font-size: 16px; }
-    .btn-info:hover { transform: scale(1.08); color: var(--text); }
+    .action-circle {
+      width: 56px; height: 56px; border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 20px;
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, opacity 0.2s;
+    }
+    .action-circle:active { transform: scale(0.87) !important; }
+    .action-circle:disabled { opacity: 0.3; cursor: not-allowed; transform: none !important; }
+    .action-label { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
 
-    /* ── Match overlay ── */
+    .btn-skip-circle { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    .btn-skip-circle:not(:disabled):hover { transform: scale(1.1) rotate(-8deg); color: var(--skip); border-color: rgba(224,92,92,0.35); box-shadow: 0 6px 20px rgba(224,92,92,0.2); }
+
+    .btn-like-circle { background: var(--accent); color: white; box-shadow: 0 6px 24px rgba(194,96,122,0.45); width: 64px; height: 64px; font-size: 24px; }
+    .btn-like-circle:not(:disabled):hover { transform: scale(1.1) rotate(8deg); background: var(--accent-light); box-shadow: 0 8px 30px rgba(194,96,122,0.65); }
+
+    /* ── Like limit warning ── */
+    .limit-toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 20px;
+      font-size: 13px; color: var(--muted);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0; z-index: 500; white-space: nowrap;
+    }
+    .limit-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .limit-toast span { color: var(--accent-light); font-weight: 500; }
+
+    /* ── Loading & empty ── */
+    .center-state { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+    .loading-ring { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-icon { font-size: 52px; opacity: 0.15; margin-bottom: 4px; }
+    .empty-title { font-family: var(--font-display); font-style: italic; font-size: 26px; color: var(--muted); }
+    .empty-sub { font-size: 13px; color: var(--muted); opacity: 0.6; max-width: 220px; line-height: 1.6; }
+
+    /* ════════════════════════════════
+       RIGHT PANEL
+    ════════════════════════════════ */
+    .right-panel {
+      border-left: 1px solid var(--border);
+      background: rgba(8,8,16,0.4);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* User info strip at top */
+    .user-strip {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); overflow: hidden; flex-shrink: 0; border: 1px solid var(--border); }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .user-meta { font-size: 11px; color: var(--muted); }
+
+    .right-scroll { flex: 1; overflow-y: auto; padding: 16px; scrollbar-width: none; }
+    .right-scroll::-webkit-scrollbar { display: none; }
+
+    .right-section { margin-bottom: 22px; }
+    .right-section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .right-section-title { font-size: 12px; font-weight: 500; color: var(--text); letter-spacing: 0.04em; }
+    .right-section-link { font-size: 11px; color: var(--accent-light); text-decoration: none; transition: opacity 0.2s; }
+    .right-section-link:hover { opacity: 0.75; }
+
+    /* Matches bubbles */
+    .matches-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .matches-row::-webkit-scrollbar { display: none; }
+    .match-bubble { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+    .match-ring {
+      width: 54px; height: 54px; border-radius: 50%; padding: 2px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    }
+    .match-ring-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: var(--surface2); }
+    .match-ring-inner img { width: 100%; height: 100%; object-fit: cover; }
+    .match-bubble-name { font-size: 10px; color: var(--muted); max-width: 54px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Liked you section */
+    .liked-you-list { display: flex; flex-direction: column; gap: 8px; }
+    .liked-you-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 12px;
+      background: var(--surface2); border: 1px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .liked-you-item:hover { border-color: var(--border-hover); background: var(--surface3); }
+    .liked-you-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface3); overflow: hidden; flex-shrink: 0;
+      filter: blur(6px); transition: filter 0.3s;
+      border: 1px solid var(--border);
+    }
+    .liked-you-avatar.revealed { filter: none; }
+    .liked-you-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .liked-you-info { flex: 1; min-width: 0; }
+    .liked-you-name { font-size: 13px; color: var(--text); margin-bottom: 2px; }
+    .liked-you-name.blurred { filter: blur(5px); color: var(--muted); font-size: 12px; user-select: none; }
+    .liked-you-meta { font-size: 11px; color: var(--muted); }
+    .liked-you-heart { color: var(--accent); font-size: 14px; }
+
+    .liked-empty { font-size: 12px; color: var(--muted2); text-align: center; padding: 16px 0; font-style: italic; font-family: var(--font-display); font-size: 14px; }
+
+    /* ════════════════════════════════
+       MATCH OVERLAY
+    ════════════════════════════════ */
     .match-overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(8,8,16,0.92); backdrop-filter: blur(8px);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(8,8,16,0.92); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.4s;
     }
     .match-overlay.show { opacity: 1; pointer-events: all; }
-    .match-glow {
-      width: 180px; height: 180px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(194,96,122,0.35), transparent 70%);
-      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
-      animation: pulse 2s ease-in-out infinite;
+
+    .match-modal { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 24px; }
+
+    .match-photos { display: flex; align-items: center; gap: 0; margin-bottom: 28px; position: relative; }
+    .match-photo-wrap {
+      width: 110px; height: 110px; border-radius: 50%; overflow: hidden;
+      border: 3px solid var(--accent); box-shadow: 0 0 40px rgba(194,96,122,0.4);
+      position: relative;
     }
-    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-    .match-icon { font-size: 64px; }
-    .match-title { font-family: var(--font-display); font-size: 48px; font-style: italic; color: var(--accent-light); margin-bottom: 8px; }
-    .match-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
-    .match-btns { display: flex; gap: 12px; }
+    .match-photo-wrap:first-child { z-index: 1; margin-right: -18px; }
+    .match-photo-wrap:last-child { z-index: 0; margin-left: -18px; border-color: var(--accent-light); }
+    .match-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .match-spark {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 44px; height: 44px; border-radius: 50%; z-index: 2;
+      background: var(--bg); border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; animation: sparkPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes sparkPulse { 0%,100% { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 0 rgba(194,96,122,0.4); } 50% { transform: translate(-50%,-50%) scale(1.1); box-shadow: 0 0 0 8px rgba(194,96,122,0); } }
+
+    .match-eyebrow { font-size: 11px; color: var(--accent); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+    .match-title { font-family: var(--font-display); font-size: 52px; font-style: italic; font-weight: 300; color: var(--text); line-height: 1; margin-bottom: 8px; }
+    .match-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; line-height: 1.6; }
+    .match-sub strong { color: var(--accent-light); }
+
+    .match-actions { display: flex; gap: 12px; }
     .match-btn {
-      padding: 12px 24px; border-radius: 12px; font-size: 14px;
-      font-family: var(--font-body); font-weight: 500; cursor: pointer;
-      transition: all 0.2s;
+      padding: 13px 28px; border-radius: 12px;
+      font-size: 14px; font-family: var(--font-body); font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
     }
-    .match-btn-chat { background: var(--accent); border: none; color: white; }
-    .match-btn-chat:hover { background: var(--accent-light); }
+    .match-btn-chat { background: var(--accent); border: none; color: white; box-shadow: 0 6px 24px rgba(194,96,122,0.4); }
+    .match-btn-chat:hover { background: var(--accent-light); transform: translateY(-1px); }
     .match-btn-keep { background: transparent; border: 1px solid var(--border); color: var(--muted); }
     .match-btn-keep:hover { border-color: var(--border-hover); color: var(--text); }
 
-    /* ── Empty state ── */
-    .empty-state { display: none; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
-    .empty-icon { font-size: 52px; opacity: 0.18; margin-bottom: 8px; }
-    .empty-title { font-family: var(--font-display); font-style: italic; font-size: 24px; color: var(--muted); }
-    .empty-sub { font-size: 13px; color: var(--muted); opacity: 0.6; }
+    /* pulse rings behind match overlay */
+    .match-pulse-ring {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(194,96,122,0.15);
+      animation: matchRingPulse 2s ease-out infinite;
+      pointer-events: none; z-index: 299;
+    }
+    .match-pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+    .match-pulse-ring:nth-child(3) { animation-delay: 1s; }
+    @keyframes matchRingPulse { 0% { transform: translate(-50%,-50%) scale(0.5); opacity: 0.6; } 100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; } }
 
-    /* loading */
-    .loading-ring { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loadWrap { display: flex; align-items: center; justify-content: center; height: 420px; }
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 60px 1fr; }
+      .right-panel { display: none; }
+      .brand-text, .nav-link span:not(.icon), .nav-link .badge, .brand-sub,
+      .sidebar-bottom .likes-left-card, .signout-btn span { display: none; }
+      .sidebar { padding: 20px 8px; align-items: center; }
+      .nav-link { justify-content: center; padding: 10px; }
+      .sidebar-brand { padding: 0 0 20px; justify-content: center; }
+      .signout-btn { justify-content: center; padding: 10px; }
+    }
+    @media (max-width: 600px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .stack-wrap { width: 290px; }
+    }
   </style>
 </head>
 <body>
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
-<nav>
-  <a class="nav-brand" href="/dashboard">
-    <div class="nav-logo"><img src="your-logo.png" onerror="this.style.display='none'"></div>
-    <span class="nav-title">Server Souls</span>
-  </a>
-  <div class="nav-links">
-    <a class="nav-link active" href="/dashboard">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      Discover
-    </a>
-    <a class="nav-link" href="/matches" id="matchesLink">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Matches
-    </a>
-    <a class="nav-link" href="/profile">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
-    </a>
-    <a class="nav-link" href="#" onclick="signOut(); return false;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign out
-    </a>
-  </div>
-</nav>
+<!-- Match pulse rings (hidden until match) -->
+<div class="match-pulse-ring" id="mpr1" style="display:none"></div>
+<div class="match-pulse-ring" id="mpr2" style="display:none"></div>
+<div class="match-pulse-ring" id="mpr3" style="display:none"></div>
 
-<main class="main">
-  <div id="loadWrap"><div class="loading-ring"></div></div>
+<div class="shell">
 
-  <div id="discoverWrap" style="display:none; flex-direction:column; align-items:center;">
-    <div class="stack-wrap" id="stackWrap">
-      <div class="shadow-card shadow-2"></div>
-      <div class="shadow-card shadow-1"></div>
-      <div class="card animate-in" id="profileCard">
-        <div class="like-stamp" id="likeStamp">LIKE</div>
-        <div class="nope-stamp" id="nopeStamp">NOPE</div>
-        <div class="card-photos" id="cardPhotos">
-          <div class="photo-dots" id="photoDots"></div>
-          <div class="tap-prev" onclick="prevPhoto()"></div>
-          <div class="tap-next" onclick="nextPhoto()"></div>
+  <!-- ════ LEFT SIDEBAR ════ -->
+  <aside class="sidebar">
+    <a class="sidebar-brand" href="/dashboard">
+      <div class="brand-logo">
+        <img src="your-logo.png" onerror="this.style.display='none'" alt="">
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Server Souls</div>
+        <div class="brand-sub">IISERB</div>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a class="nav-link active" href="/dashboard">
+        <span class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </span>
+        <span>Discover</span>
+      </a>
+      <a class="nav-link" href="/matches" id="matchesNavLink">
+        <span class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <span>Matches</span>
+        <span class="badge" id="matchBadge" style="display:none">0</span>
+      </a>
+      <a class="nav-link" href="/profile">
+        <span class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
+        <span>Profile</span>
+      </a>
+      <a class="nav-link" href="/settings">
+        <span class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        <span>Settings</span>
+      </a>
+
+      <div class="nav-divider"></div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="likes-left-card">
+        <div class="likes-left-label">Likes remaining today</div>
+        <div class="likes-bar-wrap"><div class="likes-bar" id="likesBar" style="width:100%"></div></div>
+        <div class="likes-count"><span id="likesCount">10</span> / 10 left</div>
+      </div>
+      <button class="signout-btn" onclick="signOut()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ════ MAIN SWIPE AREA ════ -->
+  <main class="main">
+    <div class="main-header">
+      <h1 class="main-title"><strong>Discover</strong> new connections</h1>
+    </div>
+
+    <!-- Loading -->
+    <div class="center-state" id="loadState">
+      <div class="loading-ring"></div>
+    </div>
+
+    <!-- Card area -->
+    <div class="card-area" id="cardArea" style="display:none">
+      <div class="stack-wrap" id="stackWrap">
+        <div class="shadow-card shadow-2" id="shadow2"></div>
+        <div class="shadow-card shadow-1" id="shadow1"></div>
+        <div class="swipe-card card-in" id="swipeCard">
+          <div class="stamp stamp-like" id="stampLike">LIKE</div>
+          <div class="stamp stamp-nope" id="stampNope">NOPE</div>
+          <div class="card-photos" id="cardPhotos">
+            <div class="photo-dots" id="photoDots"></div>
+            <div class="photo-zone photo-zone-prev" onclick="prevPhoto()"></div>
+            <div class="photo-zone photo-zone-next" onclick="nextPhoto()"></div>
+          </div>
+          <div class="card-info" id="cardInfo"></div>
         </div>
-        <div class="card-info" id="cardInfo"></div>
+      </div>
+
+      <div class="actions">
+        <div class="action-btn">
+          <button class="action-circle btn-skip-circle" id="skipBtn" onclick="doSwipe(false)">✕</button>
+          <span class="action-label">Pass</span>
+        </div>
+        <div class="action-btn">
+          <button class="action-circle btn-like-circle" id="likeBtn" onclick="doSwipe(true)">♥</button>
+          <span class="action-label">Like</span>
+        </div>
       </div>
     </div>
-    <div class="actions">
-      <button class="action-btn btn-skip" onclick="doSwipe(false)" title="Pass">✕</button>
-      <button class="action-btn btn-info" onclick="scrollCard()" title="More info">↓</button>
-      <button class="action-btn btn-like" onclick="doSwipe(true)" title="Like">♥</button>
+
+    <!-- Empty state -->
+    <div class="center-state" id="emptyState" style="display:none">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">you've seen everyone</div>
+      <div class="empty-sub">Check back tomorrow — new people join every day</div>
+    </div>
+
+    <!-- Likes exhausted state -->
+    <div class="center-state" id="limitState" style="display:none">
+      <div class="empty-icon">♥</div>
+      <div class="empty-title">out of likes</div>
+      <div class="empty-sub">You've used all 10 likes for today. Come back tomorrow!</div>
+    </div>
+  </main>
+
+  <!-- ════ RIGHT PANEL ════ -->
+  <aside class="right-panel">
+    <div class="user-strip">
+      <div class="user-avatar"><img id="myAvatar" src="" onerror="this.style.display='none'" alt=""></div>
+      <div class="user-info">
+        <div class="user-name" id="myName">—</div>
+        <div class="user-meta" id="myMeta">IISERB</div>
+      </div>
+    </div>
+
+    <div class="right-scroll">
+
+      <!-- Recent Matches -->
+      <div class="right-section">
+        <div class="right-section-head">
+          <div class="right-section-title">Recent Matches</div>
+          <a class="right-section-link" href="/matches">View all →</a>
+        </div>
+        <div class="matches-row" id="matchesRow">
+          <div style="font-size:12px;color:var(--muted2);font-style:italic;font-family:var(--font-display);padding:8px 0">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Who Liked You -->
+      <div class="right-section">
+        <div class="right-section-head">
+          <div class="right-section-title">Who liked you ♥</div>
+        </div>
+        <div class="liked-you-list" id="likedYouList">
+          <div style="font-size:12px;color:var(--muted2);padding:8px 0">Loading...</div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<!-- ════ MATCH OVERLAY ════ -->
+<div class="match-overlay" id="matchOverlay" onclick="handleOverlayClick(event)">
+  <div class="match-modal" id="matchModal">
+    <div class="match-photos">
+      <div class="match-photo-wrap"><img id="matchMyPhoto" src="" alt=""></div>
+      <div class="match-spark">✦</div>
+      <div class="match-photo-wrap"><img id="matchTheirPhoto" src="" alt=""></div>
+    </div>
+    <div class="match-eyebrow">It's a match</div>
+    <div class="match-title">you connected</div>
+    <div class="match-sub" id="matchSub">You and <strong id="matchName">someone</strong> liked each other</div>
+    <div class="match-actions">
+      <button class="match-btn match-btn-chat" id="matchChatBtn">Send a message</button>
+      <button class="match-btn match-btn-keep" onclick="dismissMatch()">Keep swiping</button>
     </div>
   </div>
+</div>
 
-  <div class="empty-state" id="emptyState">
-    <div class="empty-icon">✦</div>
-    <div class="empty-title">you've seen everyone</div>
-    <div class="empty-sub">check back tomorrow — new people join every day</div>
-  </div>
-</main>
-
-<!-- Match overlay -->
-<div class="match-overlay" id="matchOverlay">
-  <div class="match-glow"><div class="match-icon">✦</div></div>
-  <div class="match-title">it's a match</div>
-  <div class="match-sub" id="matchSub">You and someone both liked each other</div>
-  <div class="match-btns">
-    <button class="match-btn match-btn-chat" id="matchChatBtn">Send a message</button>
-    <button class="match-btn match-btn-keep" onclick="dismissMatch()">Keep swiping</button>
-  </div>
+<!-- Like limit toast -->
+<div class="limit-toast" id="limitToast">
+  <span id="likesLeftToast">0</span> likes left today — use them wisely ✦
 </div>
 
 <script src="/app.js"></script>
 <script>
-  let profiles = [];
-  let currentIdx = 0;
-  let currentPhotoIdx = 0;
-  let isDragging = false;
-  let startX = 0, startY = 0, currentX = 0;
-  let lastMatchId = null;
+  // ── Constants ──────────────────────────────────────────────
+  const DAILY_LIMIT = 10;
+  const LIKES_KEY   = 'ss_likes_' + new Date().toDateString(); // resets daily
 
+  // ── State ──────────────────────────────────────────────────
+  let profiles     = [];
+  let currentIdx   = 0;
+  let photoIdx     = 0;
+  let likesUsed    = parseInt(localStorage.getItem(LIKES_KEY) || '0');
+  let isDragging   = false;
+  let startX = 0, currentX = 0;
+  let myProfile    = null;
+  let pendingMatchId = null;
+  let animating    = false;
+
+  // ── Init ───────────────────────────────────────────────────
   async function init() {
     await requireAuth();
-    await loadProfiles();
-    await loadMatchCount();
+    updateLikesUI();
+    await Promise.all([loadMyProfile(), loadProfiles(), loadSidebar()]);
   }
 
+  // ── My profile ──────────────────────────────────────────────
+  async function loadMyProfile() {
+    try {
+      myProfile = await api('/api/profile/me');
+      const photos = (myProfile.photos || []).sort((a,b) => a.position - b.position);
+      document.getElementById('myAvatar').src = photos[0]?.url || '';
+      document.getElementById('myName').textContent = myProfile.first_name || '—';
+      document.getElementById('myMeta').textContent = [myProfile.year, myProfile.hostel].filter(Boolean).join(' · ') || 'IISERB';
+    } catch {}
+  }
+
+  // ── Profiles ───────────────────────────────────────────────
   async function loadProfiles() {
     try {
-      profiles = await api("/api/discover");
-      document.getElementById("loadWrap").style.display = "none";
-      if (profiles.length === 0) {
-        showEmpty(); return;
-      }
-      document.getElementById("discoverWrap").style.display = "flex";
-      renderCard(0);
+      profiles = await api('/api/discover');
     } catch (e) {
-      document.getElementById("loadWrap").innerHTML = `<p style="color:var(--muted);font-size:14px">${e.message}</p>`;
+      profiles = [];
     }
+    document.getElementById('loadState').style.display = 'none';
+
+    if (likesUsed >= DAILY_LIMIT) { showLimitState(); return; }
+    if (!profiles.length) { showEmpty(); return; }
+
+    document.getElementById('cardArea').style.display = 'flex';
+    renderCard(0);
   }
 
-  async function loadMatchCount() {
+  // ── Sidebar: matches + liked you ──────────────────────────
+  async function loadSidebar() {
     try {
-      const matches = await api("/api/matches");
-      const link = document.getElementById("matchesLink");
-      if (matches.length > 0) {
-        link.innerHTML += `<span class="badge">${matches.length}</span>`;
+      const matches = await api('/api/matches');
+
+      // Match badge
+      if (matches.length) {
+        const badge = document.getElementById('matchBadge');
+        badge.textContent = matches.length;
+        badge.style.display = 'flex';
+      }
+
+      // Matches row
+      const row = document.getElementById('matchesRow');
+      if (!matches.length) {
+        row.innerHTML = `<div class="liked-empty">No matches yet — keep swiping</div>`;
+      } else {
+        row.innerHTML = matches.slice(0, 6).map(m => `
+          <div class="match-bubble" onclick="window.location.href='/chat?id=${m.match_id}'">
+            <div class="match-ring">
+              <div class="match-ring-inner">
+                <img src="${m.profile?.photo || ''}" onerror="this.style.display='none'" alt="">
+              </div>
+            </div>
+            <div class="match-bubble-name">${m.profile?.first_name || '?'}</div>
+          </div>
+        `).join('');
+      }
+
+      // Who liked you — show blurred unless matched
+      const likedList = document.getElementById('likedYouList');
+      const liked = await api('/api/liked-you').catch(() => []);
+      if (!liked.length) {
+        likedList.innerHTML = `<div class="liked-empty">When someone likes you,<br>they'll appear here</div>`;
+      } else {
+        likedList.innerHTML = liked.map(l => {
+          const isMatch = matches.some(m => m.profile?.id === l.id);
+          const photo = l.photos?.[0]?.url || '';
+          return `
+            <div class="liked-you-item" onclick="${isMatch ? `window.location.href='/matches'` : 'void(0)'}">
+              <div class="liked-you-avatar ${isMatch ? 'revealed' : ''}">
+                <img src="${photo}" onerror="this.style.display='none'" alt="">
+              </div>
+              <div class="liked-you-info">
+                <div class="liked-you-name ${isMatch ? '' : 'blurred'}">${isMatch ? l.first_name : '?????'}, ${l.age || '?'}</div>
+                <div class="liked-you-meta">${isMatch ? l.hostel || 'IISERB' : 'Match to reveal'}</div>
+              </div>
+              <div class="liked-you-heart">♥</div>
+            </div>
+          `;
+        }).join('');
       }
     } catch {}
   }
 
+  // ── Render card ────────────────────────────────────────────
   function renderCard(idx) {
     if (idx >= profiles.length) { showEmpty(); return; }
     const p = profiles[idx];
-    currentPhotoIdx = 0;
+    photoIdx = 0;
 
-    // Photos
-    const photosEl = document.getElementById("cardPhotos");
-    // remove old images
-    photosEl.querySelectorAll("img").forEach(i => i.remove());
+    // Remove old photos
+    document.querySelectorAll('#cardPhotos img').forEach(i => i.remove());
 
-    const photos = p.photos?.length ? p.photos : [{ url: "https://randomuser.me/api/portraits/lego/1.jpg" }];
+    const photos = p.photos?.length
+      ? [...p.photos].sort((a,b) => a.position - b.position)
+      : [{ url: 'https://randomuser.me/api/portraits/lego/1.jpg' }];
+
     photos.forEach((ph, i) => {
-      const img = document.createElement("img");
-      img.src = ph.url; img.alt = "";
-      if (i === 0) img.classList.add("visible");
-      photosEl.appendChild(img);
+      const img = document.createElement('img');
+      img.className = 'card-photo' + (i === 0 ? ' visible' : '');
+      img.src = ph.url; img.alt = '';
+      document.getElementById('cardPhotos').appendChild(img);
     });
 
     // Dots
-    const dotsEl = document.getElementById("photoDots");
-    dotsEl.innerHTML = photos.length > 1 ? photos.map((_, i) =>
-      `<div class="photo-dot ${i===0?'active':''}" onclick="goPhoto(${i}, event)"></div>`
-    ).join("") : "";
+    const dots = document.getElementById('photoDots');
+    dots.innerHTML = photos.length > 1
+      ? photos.map((_,i) => `<div class="photo-dot ${i===0?'active':''}"></div>`).join('')
+      : '';
 
     // Info
     const tags = [p.year, p.major, p.hostel, p.home_state].filter(Boolean);
-    document.getElementById("cardInfo").innerHTML = `
-      <div class="card-name">${p.first_name || "?"}, ${p.age || "?"}</div>
-      <div class="card-meta">${tags.map(t=>`<span>${t}</span>`).join("")}</div>
+    document.getElementById('cardInfo').innerHTML = `
+      <div class="card-name">${p.first_name || '?'}, ${p.age || '?'}</div>
+      <div class="card-tags">${tags.map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>
       ${p.prompt_question ? `
-      <div class="card-prompt">
-        <div class="card-prompt-q">${p.prompt_question}</div>
-        <div class="card-prompt-a">${p.prompt_answer || "..."}</div>
-      </div>` : ""}
+        <div class="card-prompt">
+          <div class="card-prompt-q">${p.prompt_question}</div>
+          <div class="card-prompt-a">${p.prompt_answer || '...'}</div>
+        </div>` : ''}
     `;
 
-    // Reset card
-    const card = document.getElementById("profileCard");
-    card.classList.remove("fly-right", "fly-left");
-    card.style.transform = "";
-    card.classList.add("animate-in");
-    setTimeout(() => card.classList.remove("animate-in"), 500);
+    // Animate card in
+    const card = document.getElementById('swipeCard');
+    card.classList.remove('fly-right','fly-left','card-in');
+    void card.offsetWidth;
+    card.classList.add('card-in');
+    card.style.transform = '';
 
     setupDrag();
   }
 
-  function goPhoto(i, e) { e?.stopPropagation(); setPhoto(i); }
-  function nextPhoto() { setPhoto(Math.min(currentPhotoIdx + 1, (profiles[currentIdx]?.photos?.length || 1) - 1)); }
-  function prevPhoto() { setPhoto(Math.max(currentPhotoIdx - 1, 0)); }
+  // ── Photo navigation ────────────────────────────────────────
   function setPhoto(i) {
-    const imgs = document.querySelectorAll("#cardPhotos img");
-    const dots = document.querySelectorAll(".photo-dot");
-    imgs.forEach((img, idx) => img.classList.toggle("visible", idx === i));
-    dots.forEach((d, idx) => d.classList.toggle("active", idx === i));
-    currentPhotoIdx = i;
+    const imgs  = document.querySelectorAll('#cardPhotos .card-photo');
+    const dots  = document.querySelectorAll('#photoDots .photo-dot');
+    const count = imgs.length;
+    if (i < 0 || i >= count) return;
+    imgs.forEach((img, idx)  => img.classList.toggle('visible', idx === i));
+    dots.forEach((dot, idx)  => dot.classList.toggle('active',  idx === i));
+    photoIdx = i;
   }
+  function nextPhoto() { setPhoto(photoIdx + 1); }
+  function prevPhoto() { setPhoto(photoIdx - 1); }
 
-  function scrollCard() {
-    document.querySelector(".card-info").scrollIntoView({ behavior: "smooth" });
-  }
-
+  // ── Swipe logic ─────────────────────────────────────────────
   async function doSwipe(isLike) {
-    if (currentIdx >= profiles.length) return;
-    const p = profiles[currentIdx];
-    const card = document.getElementById("profileCard");
+    if (animating || currentIdx >= profiles.length) return;
+    if (isLike && likesUsed >= DAILY_LIMIT) { showLimitToast(); return; }
 
-    card.classList.add(isLike ? "fly-right" : "fly-left");
+    animating = true;
+    const p   = profiles[currentIdx];
+    const card = document.getElementById('swipeCard');
 
-    try {
-      const result = await api("/api/swipe", { method: "POST", body: { swiped_id: p.id, is_like: isLike } });
-      if (result.matched) showMatch(p);
-    } catch {}
+    card.classList.add(isLike ? 'fly-right' : 'fly-left');
+    document.getElementById('stampLike').style.opacity = 0;
+    document.getElementById('stampNope').style.opacity = 0;
+
+    if (isLike) {
+      likesUsed++;
+      localStorage.setItem(LIKES_KEY, likesUsed);
+      updateLikesUI();
+    }
+
+    // API call (non-blocking)
+    api('/api/swipe', { method: 'POST', body: { swiped_id: p.id, is_like: isLike } })
+      .then(result => {
+        if (result.matched) {
+          // Find match id to link to chat
+          api('/api/matches').then(matches => {
+            const m = matches.find(mm => mm.profile?.id === p.id);
+            pendingMatchId = m?.match_id || null;
+            showMatch(p);
+            loadSidebar(); // refresh sidebar
+          }).catch(() => showMatch(p));
+        }
+      }).catch(() => {});
 
     setTimeout(() => {
       currentIdx++;
+      animating = false;
+      if (likesUsed >= DAILY_LIMIT && isLike) { showLimitState(); return; }
+      if (currentIdx >= profiles.length) { showEmpty(); return; }
       renderCard(currentIdx);
-    }, 350);
+    }, 380);
   }
 
-  function showMatch(p) {
-    document.getElementById("matchSub").textContent = `You and ${p.first_name} both liked each other 💫`;
-    document.getElementById("matchOverlay").classList.add("show");
-    // We'd need match_id to go to chat — fetch matches to find it
-    api("/api/matches").then(matches => {
-      const m = matches.find(m => m.profile?.id === p.id);
-      if (m) {
-        lastMatchId = m.match_id;
-        document.getElementById("matchChatBtn").onclick = () => {
-          window.location.href = `/chat?id=${m.match_id}`;
-        };
-      }
-    }).catch(() => {});
-  }
-
-  function dismissMatch() {
-    document.getElementById("matchOverlay").classList.remove("show");
-  }
-
-  function showEmpty() {
-    document.getElementById("discoverWrap").style.display = "none";
-    document.getElementById("emptyState").style.display = "flex";
-  }
-
-  // ── Drag to swipe ──
+  // ── Drag ────────────────────────────────────────────────────
   function setupDrag() {
-    const card = document.getElementById("profileCard");
-    card.addEventListener("mousedown", onStart);
-    card.addEventListener("touchstart", onStart, { passive: true });
+    const card = document.getElementById('swipeCard');
+    card.onmousedown  = onDragStart;
+    card.ontouchstart = onDragStart;
   }
 
-  function onStart(e) {
+  function onDragStart(e) {
+    if (animating) return;
     isDragging = true;
     startX = e.touches ? e.touches[0].clientX : e.clientX;
-    startY = e.touches ? e.touches[0].clientY : e.clientY;
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onEnd);
-    document.addEventListener("touchmove", onMove, { passive: true });
-    document.addEventListener("touchend", onEnd);
+    currentX = 0;
+    document.onmousemove  = onDragMove;
+    document.ontouchmove  = onDragMove;
+    document.onmouseup    = onDragEnd;
+    document.ontouchend   = onDragEnd;
   }
 
-  function onMove(e) {
+  function onDragMove(e) {
     if (!isDragging) return;
     currentX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
-    const rotate = currentX * 0.08;
-    document.getElementById("profileCard").style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
-    const threshold = 60;
-    document.getElementById("likeStamp").style.opacity = Math.max(0, (currentX - 20) / threshold);
-    document.getElementById("nopeStamp").style.opacity  = Math.max(0, (-currentX - 20) / threshold);
+    const rot = currentX * 0.07;
+    const card = document.getElementById('swipeCard');
+    card.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
+    const t = 60;
+    document.getElementById('stampLike').style.opacity = Math.max(0, (currentX - 20) / t).toFixed(2);
+    document.getElementById('stampNope').style.opacity = Math.max(0, (-currentX - 20) / t).toFixed(2);
   }
 
-  function onEnd() {
+  function onDragEnd() {
+    if (!isDragging) return;
     isDragging = false;
-    document.removeEventListener("mousemove", onMove);
-    document.removeEventListener("mouseup", onEnd);
-    document.removeEventListener("touchmove", onMove);
-    document.removeEventListener("touchend", onEnd);
-    document.getElementById("likeStamp").style.opacity = 0;
-    document.getElementById("nopeStamp").style.opacity  = 0;
+    document.onmousemove = document.ontouchmove = document.onmouseup = document.ontouchend = null;
+    document.getElementById('stampLike').style.opacity = 0;
+    document.getElementById('stampNope').style.opacity = 0;
+
     if (Math.abs(currentX) > 100) {
       doSwipe(currentX > 0);
     } else {
-      document.getElementById("profileCard").style.transform = "";
+      const card = document.getElementById('swipeCard');
+      card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+      card.style.transform  = '';
+      setTimeout(() => card.style.transition = '', 350);
     }
     currentX = 0;
   }
 
   // Keyboard
-  document.addEventListener("keydown", e => {
-    if (e.key === "ArrowRight") doSwipe(true);
-    if (e.key === "ArrowLeft")  doSwipe(false);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') doSwipe(true);
+    if (e.key === 'ArrowLeft')  doSwipe(false);
   });
+
+  // ── Likes UI ────────────────────────────────────────────────
+  function updateLikesUI() {
+    const left = Math.max(0, DAILY_LIMIT - likesUsed);
+    const pct  = (left / DAILY_LIMIT) * 100;
+    document.getElementById('likesCount').textContent = left;
+    document.getElementById('likesBar').style.width   = pct + '%';
+    document.getElementById('likeBtn').disabled       = left === 0;
+
+    // Colour bar red when low
+    const bar = document.getElementById('likesBar');
+    if (left <= 2) bar.style.background = 'linear-gradient(90deg, var(--skip), #ff8a80)';
+    else if (left <= 5) bar.style.background = 'linear-gradient(90deg, var(--gold), #ffe082)';
+    else bar.style.background = 'linear-gradient(90deg, var(--accent), var(--accent-light))';
+  }
+
+  function showLimitToast() {
+    const left = Math.max(0, DAILY_LIMIT - likesUsed);
+    document.getElementById('likesLeftToast').textContent = left;
+    const toast = document.getElementById('limitToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ── States ──────────────────────────────────────────────────
+  function showEmpty() {
+    document.getElementById('cardArea').style.display    = 'none';
+    document.getElementById('emptyState').style.display  = 'flex';
+    document.getElementById('limitState').style.display  = 'none';
+  }
+  function showLimitState() {
+    document.getElementById('cardArea').style.display    = 'none';
+    document.getElementById('emptyState').style.display  = 'none';
+    document.getElementById('limitState').style.display  = 'flex';
+  }
+
+  // ── Match overlay ────────────────────────────────────────────
+  function showMatch(p) {
+    const myPhotos   = (myProfile?.photos || []).sort((a,b) => a.position - b.position);
+    const theirPhotos = (p.photos || []).sort((a,b) => a.position - b.position);
+
+    document.getElementById('matchMyPhoto').src    = myPhotos[0]?.url   || '';
+    document.getElementById('matchTheirPhoto').src = theirPhotos[0]?.url || '';
+    document.getElementById('matchName').textContent = p.first_name || 'someone';
+
+    document.getElementById('matchChatBtn').onclick = () => {
+      window.location.href = pendingMatchId ? `/chat?id=${pendingMatchId}` : '/matches';
+    };
+
+    ['mpr1','mpr2','mpr3'].forEach(id => document.getElementById(id).style.display = 'block');
+    document.getElementById('matchOverlay').classList.add('show');
+  }
+
+  function dismissMatch() {
+    document.getElementById('matchOverlay').classList.remove('show');
+    ['mpr1','mpr2','mpr3'].forEach(id => document.getElementById(id).style.display = 'none');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('matchOverlay')) dismissMatch();
+  }
 
   init();
 </script>
