@@ -38,6 +38,18 @@ async function requireAuth() {
   return token;
 }
 
+// Route users based on whether onboarding has created their profile.
+async function requireProfile() {
+  const token = await requireAuth();
+  if (!token) return null;
+  const { onboarded } = await api("/api/profile/status");
+  if (!onboarded) {
+    window.location.href = "/onboarding";
+    return null;
+  }
+  return true;
+}
+
 // Sign out
 async function signOut() {
   const token = await getToken();

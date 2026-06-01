@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Server Souls — Discover</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #080810;
@@ -26,8 +25,8 @@
       --like: #4caf7d;
       --like-glow: rgba(76,175,125,0.2);
       --skip: #e05c5c;
-      --font-display: 'Cormorant Garamond', serif;
-      --font-body: 'DM Sans', sans-serif;
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       --nav-w: 220px;
     }
 
@@ -421,6 +420,92 @@
       .sidebar { display: none; }
       .stack-wrap { width: 290px; }
     }
+
+    /* Stitch-inspired controls with the login-page dark rose palette */
+    :root {
+      --bg: #0c0c0f; --surface: rgba(20,20,26,0.9); --surface2: rgba(28,28,38,0.92);
+      --surface3: #242431; --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.16);
+      --text: #f0ede8; --muted: #8a8899; --muted2: #575464; --accent: #c2607a;
+      --accent-light: #e8859a; --accent-glow: rgba(194,96,122,0.22); --accent-dim: rgba(194,96,122,0.12);
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      --nav-w: 246px;
+    }
+    html, body { overflow-x: hidden; }
+    body { background: radial-gradient(circle at 18% 12%, rgba(194,96,122,0.16), transparent 30%), radial-gradient(circle at 76% 88%, rgba(120,100,200,0.11), transparent 32%), var(--bg); }
+    .shell { grid-template-columns: var(--nav-w) minmax(500px, 1fr) 310px; }
+    .sidebar, .right-panel { background: rgba(12,12,15,0.62); backdrop-filter: blur(28px); }
+    .sidebar { padding: 24px 18px; }
+    .sidebar-brand { padding: 0 6px 24px; }
+    .brand-logo { width: 42px; height: 42px; border-radius: 13px; }
+    .brand-name { font-family: var(--font-display); font-size: 17px; letter-spacing: -0.02em; }
+    .brand-sub { margin-top: 3px; }
+    .nav-links { gap: 6px; }
+    .nav-link { gap: 12px; padding: 12px 13px; border-radius: 14px; font-size: 14px; }
+    .nav-link .icon { width: 28px; height: 28px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,0.035); }
+    .nav-link.active { color: #fff; background: linear-gradient(135deg, rgba(194,96,122,0.92), rgba(144,74,124,0.9)); box-shadow: 0 10px 24px rgba(194,96,122,0.16); }
+    .nav-link.active .icon { background: rgba(255,255,255,0.12); }
+    .likes-left-card { border-radius: 16px; padding: 15px; background: rgba(255,255,255,0.035); }
+    .signout-btn { border-radius: 12px; }
+    .main { justify-content: flex-start; padding: 104px 28px 24px; overflow-y: auto; }
+    .main-header { padding: 22px 30px 0; align-items: center; justify-content: space-between; }
+    .header-copy { display: flex; flex-direction: column; gap: 3px; }
+    .header-eyebrow { color: var(--accent-light); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+    .main-title { font-family: var(--font-display); font-size: 29px; font-style: normal; font-weight: 700; letter-spacing: -0.045em; }
+    .main-title strong { color: var(--accent-light); font-weight: 700; }
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .header-pill { padding: 9px 13px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.035); color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+    .header-pill.active { color: var(--text); border-color: rgba(194,96,122,0.32); background: var(--accent-dim); }
+    .card-area { margin-top: 2px; }
+    .stack-wrap { width: min(510px, calc(100vw - 620px)); min-width: 390px; }
+    .shadow-card, .swipe-card { border-radius: 28px; }
+    .swipe-card { border-color: rgba(255,255,255,0.12); box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(194,96,122,0.08); }
+    .card-photos { height: min(540px, calc(100vh - 245px)); min-height: 430px; }
+    .card-info { padding: 0 23px 22px; }
+    .card-name { font-family: var(--font-display); font-size: 32px; font-style: normal; font-weight: 700; letter-spacing: -0.04em; }
+    .card-tag { padding: 5px 10px; background: rgba(255,255,255,0.11); backdrop-filter: blur(8px); }
+    .card-prompt { border-radius: 12px; background: rgba(12,12,15,0.58); }
+    .card-prompt-a { font-family: var(--font-body); font-style: normal; }
+    .actions { gap: 24px; margin-top: 22px; }
+    .action-circle { width: 72px; height: 72px; font-size: 26px; border: 2px solid var(--border); box-shadow: 0 14px 30px rgba(0,0,0,0.28); }
+    .btn-skip-circle { color: #e05c5c; border-color: rgba(224,92,92,0.28); background: rgba(224,92,92,0.09); }
+    .btn-like-circle { width: 88px; height: 88px; font-size: 34px; background: linear-gradient(135deg, var(--accent), #a64c76); box-shadow: 0 12px 34px rgba(194,96,122,0.32); }
+    .btn-super-circle { color: #b48cff; border-color: rgba(180,140,255,0.32); background: rgba(180,140,255,0.1); }
+    .action-label { color: var(--muted); font-size: 11px; text-transform: none; letter-spacing: 0; }
+    .user-strip { padding: 18px; }
+    .user-avatar { width: 44px; height: 44px; }
+    .right-scroll { padding: 16px; }
+    .right-section { padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.025); }
+    .right-section-title { font-size: 13px; }
+    .liked-you-item { background: rgba(255,255,255,0.035); border-radius: 14px; }
+    .mobile-nav { display: none; }
+    @media (max-width: 1120px) {
+      .shell { grid-template-columns: 76px minmax(390px, 1fr) 280px; }
+      .brand-text, .nav-link span:not(.icon), .nav-link .badge, .brand-sub, .sidebar-bottom .likes-left-card, .signout-btn span { display: none; }
+      .sidebar { padding: 20px 12px; align-items: center; }
+      .nav-link { justify-content: center; padding: 9px; }
+      .sidebar-brand { padding: 0 0 20px; justify-content: center; }
+      .signout-btn { justify-content: center; }
+      .stack-wrap { width: min(470px, calc(100vw - 410px)); min-width: 360px; }
+    }
+    @media (max-width: 820px) {
+      body { overflow: auto; padding-bottom: 72px; }
+      .shell { display: block; height: auto; min-height: 100vh; }
+      .sidebar, .right-panel { display: none; }
+      .main { min-height: 100vh; padding: 96px 16px 26px; overflow: visible; }
+      .main-header { padding: 19px 17px 0; align-items: flex-end; }
+      .main-title { font-size: 25px; }
+      .header-pill:first-child { display: none; }
+      .header-pill { padding: 8px 11px; }
+      .stack-wrap { width: min(100%, 430px); min-width: 0; }
+      .card-photos { height: min(570px, calc(100vh - 245px)); min-height: 430px; }
+      .actions { gap: 18px; }
+      .action-circle { width: 64px; height: 64px; }
+      .btn-like-circle { width: 78px; height: 78px; }
+      .mobile-nav { position: fixed; z-index: 200; left: 12px; right: 12px; bottom: 10px; display: flex; justify-content: space-around; align-items: center; padding: 9px 8px; border: 1px solid var(--border); border-radius: 20px; background: rgba(20,20,26,0.88); backdrop-filter: blur(22px); box-shadow: 0 12px 32px rgba(0,0,0,0.34); }
+      .mobile-nav a { display: grid; place-items: center; width: 44px; height: 38px; color: var(--muted); text-decoration: none; border-radius: 12px; }
+      .mobile-nav a.active { color: #fff; background: var(--accent); }
+    }
   </style>
 </head>
 <body>
@@ -439,7 +524,7 @@
   <aside class="sidebar">
     <a class="sidebar-brand" href="/dashboard">
       <div class="brand-logo">
-        <img src="your-logo.png" onerror="this.style.display='none'" alt="">
+        <img src="/Draft_5-modified.png" onerror="this.style.display='none'" alt="">
       </div>
       <div class="brand-text">
         <div class="brand-name">Server Souls</div>
@@ -493,7 +578,14 @@
   <!-- ════ MAIN SWIPE AREA ════ -->
   <main class="main">
     <div class="main-header">
-      <h1 class="main-title"><strong>Discover</strong> new connections</h1>
+      <div class="header-copy">
+        <span class="header-eyebrow">Nearby profiles</span>
+        <h1 class="main-title">Discover <strong>new connections</strong></h1>
+      </div>
+      <div class="header-actions">
+        <button class="header-pill">Filters</button>
+        <button class="header-pill active">Nearby</button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -526,6 +618,10 @@
         <div class="action-btn">
           <button class="action-circle btn-like-circle" id="likeBtn" onclick="doSwipe(true)">♥</button>
           <span class="action-label">Like</span>
+        </div>
+        <div class="action-btn">
+          <button class="action-circle btn-super-circle" type="button" title="Super likes are coming soon">&#9734;</button>
+          <span class="action-label">Super like</span>
         </div>
       </div>
     </div>
@@ -584,6 +680,13 @@
 </div>
 
 <!-- ════ MATCH OVERLAY ════ -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <a class="active" href="/dashboard" aria-label="Discover">&#9829;</a>
+  <a href="/matches" aria-label="Matches">&#9993;</a>
+  <a href="/profile" aria-label="Profile">&#9675;</a>
+  <a href="/settings" aria-label="Settings">&#9881;</a>
+</nav>
+
 <div class="match-overlay" id="matchOverlay" onclick="handleOverlayClick(event)">
   <div class="match-modal" id="matchModal">
     <div class="match-photos">
@@ -625,7 +728,7 @@
 
   // ── Init ───────────────────────────────────────────────────
   async function init() {
-    await requireAuth();
+    if (!await requireProfile()) return;
     updateLikesUI();
     await Promise.all([loadMyProfile(), loadProfiles(), loadSidebar()]);
   }

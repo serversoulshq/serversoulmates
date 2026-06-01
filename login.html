@@ -477,18 +477,19 @@ sb.auth.onAuthStateChange(async (event, session) => {
     }
 
     // ✅ Check if user already onboarded
-const { data } = await sb
-  .from('participants')
-  .select('user_id')
-  .eq('user_id', session.user.id)
-  .maybeSingle();
+const statusResponse = await fetch('/api/profile/status', {
+  headers: { 'Authorization': `Bearer ${session.access_token}` }
+});
+const { onboarded = false } = statusResponse.ok
+  ? await statusResponse.json()
+  : {};
 
     window.history.replaceState({}, document.title, window.location.pathname);
 
-if (!data) {
-  window.location.href = '/onboarding.html';
+if (!onboarded) {
+  window.location.href = '/onboarding';
 } else {
-  window.location.href = '/dashboard.html';
+  window.location.href = '/dashboard';
 }
   }
 });

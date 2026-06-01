@@ -102,6 +102,18 @@ app.get("/api/profile/me", auth, async (req, res) => {
   res.json(data);
 });
 
+// Check whether the signed-in user has completed onboarding.
+app.get("/api/profile/status", auth, async (req, res) => {
+  const { data, error } = await sb
+    .from("profiles")
+    .select("id")
+    .eq("id", req.user.id)
+    .maybeSingle();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ onboarded: !!data });
+});
+
 // Save / update own profile
 app.post("/api/profile/save", auth, async (req, res) => {
   const allowed = ["first_name", "dob", "gender", "looking_for", "year", "major", "home_state", "hostel", "prompt_question", "prompt_answer"];
