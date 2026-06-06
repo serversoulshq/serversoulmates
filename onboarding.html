@@ -954,6 +954,7 @@ for (let i = 0; i < photos.length; i++) {
     });
 
   if (uploadError) {
+    alert(uploadError.message);
     console.error(uploadError);
     continue;
   }
