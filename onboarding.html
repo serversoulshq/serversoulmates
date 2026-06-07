@@ -954,7 +954,8 @@ for (let i = 0; i < photos.length; i++) {
     });
 
   if (uploadError) {
-    alert(uploadError.message);
+    alert(JSON.stringify(uploadError));
+    alert(JSON.stringify(photoError));
     console.error(uploadError);
     continue;
   }
