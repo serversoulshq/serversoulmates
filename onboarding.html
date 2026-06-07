@@ -947,6 +947,8 @@ for (let i = 0; i < photos.length; i++) {
   const filePath = `${user.id}/${Date.now()}_${i}.jpg`;
 
   // upload to storage
+  const { data:{session} } = await sb.auth.getSession();
+  console.log("SESSION:", session);
   const { error: uploadError } = await sb.storage
     .from('profile_images')
     .upload(filePath, file, {
