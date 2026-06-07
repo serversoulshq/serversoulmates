@@ -948,7 +948,6 @@ for (let i = 0; i < photos.length; i++) {
 
   // upload to storage
   const { data:{session} } = await sb.auth.getSession();
-  console.log("SESSION:", session);
   const { error: uploadError } = await sb.storage
     .from('profile_images')
     .upload(filePath, file, {
@@ -956,7 +955,6 @@ for (let i = 0; i < photos.length; i++) {
     });
 
   if (uploadError) {
-    alert(JSON.stringify(uploadError));
     console.error(uploadError);
     continue;
   }
