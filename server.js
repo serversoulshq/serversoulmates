@@ -48,11 +48,6 @@ app.post("/api/send-otp", async (req, res) => {
     return res.status(403).json({ error: "Only @iiserb.ac.in emails are allowed." });
   }
 
-  const { error } = await sb.auth.admin.generateLink({
-    type: "magiclink",
-    email: email.toLowerCase().trim(),
-  });
-
   // We use signInWithOtp because generateLink needs SMTP config for magic links
   const { error: otpError } = await sb.auth.signInWithOtp({
     email: email.toLowerCase().trim(),
