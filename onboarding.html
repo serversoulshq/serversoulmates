@@ -976,6 +976,10 @@ for (let i = 0; i < photos.length; i++) {
       url: publicUrl,
       position: i
     });
+  console.log("PHOTO INSERT ERROR:", photoError);
+  if (photoError) {
+  alert(photoError.message);
+  }
 
   console.log("PHOTO ERROR:", photoError);
 
