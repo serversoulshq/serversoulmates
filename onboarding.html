@@ -977,6 +977,9 @@ for (let i = 0; i < photos.length; i++) {
       position: i
     });
 
+  console.log("PHOTO ERROR:", photoError);
+  alert(JSON.stringify(photoError));
+
   if (photoError) {
     console.error(photoError);
   }
