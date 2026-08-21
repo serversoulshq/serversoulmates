@@ -1435,81 +1435,108 @@
         `server-souls-chat-${matchId}-${myUserId}`;
 
 
-      realtimeChannel =
-        _sb
-          .channel(channelName)
-
-          .on(
-            "postgres_changes",
-            {
-              event: "INSERT",
-
-              schema: "public",
-
-              table: "messages",
-
-              filter:
-                `match_id=eq.${matchId}`
-            },
-
-            payload => {
-
-              handleRealtimeMessage(
-                payload.new
-              );
-            }
-          )
-
-          .subscribe(
-            status => {
-
+      async function subscribeRealtime() {
+        try {
+          // Remove previous subscription
+          if (realtimeChannel) {
+            await _sb.removeChannel(realtimeChannel);
+            realtimeChannel = null;
+          }
+      
+          console.log("Starting realtime for match:", matchId);
+      
+          realtimeChannel = _sb
+            .channel(`messages-${matchId}`)
+      
+            .on(
+              "postgres_changes",
+              {
+                event: "INSERT",
+                schema: "public",
+                table: "messages"
+              },
+              (payload) => {
+                console.log("🔥 REALTIME EVENT:", payload);
+      
+                const message = payload.new;
+      
+                // Only accept messages belonging to this chat
+                if (
+                  String(message.match_id) !==
+                  String(matchId)
+                ) {
+                  return;
+                }
+      
+                if (!message.id) return;
+      
+                const id = String(message.id);
+      
+                // Prevent duplicates
+                if (messages.has(id)) {
+                  return;
+                }
+      
+                messages.set(id, message);
+      
+                renderMessages({
+                  forceScroll: true
+                });
+      
+                console.log("✅ New message displayed");
+              }
+            )
+      
+            .subscribe((status) => {
+      
               console.log(
-                "Chat realtime:",
+                "📡 REALTIME STATUS:",
                 status
               );
-
-
-              if (
-                status === "SUBSCRIBED"
-              ) {
-
-                updateConnectionStatus(
-                  "online"
+      
+              if (status === "SUBSCRIBED") {
+                console.log(
+                  "✅ REALTIME CONNECTED!"
                 );
-
-                clearTimeout(
-                  realtimeRetryTimer
-                );
-
-                return;
+      
+                updateConnectionStatus("online");
               }
-
-
-              if (
-                status === "CHANNEL_ERROR" ||
-                status === "TIMED_OUT"
-              ) {
-
-                updateConnectionStatus(
-                  "offline"
+      
+              if (status === "CHANNEL_ERROR") {
+                console.error(
+                  "❌ REALTIME CHANNEL ERROR"
                 );
-
-                scheduleRealtimeRetry();
+      
+                updateConnectionStatus("offline");
               }
-
-
-              if (
-                status === "CLOSED"
-              ) {
-
-                updateConnectionStatus(
-                  "offline"
+      
+              if (status === "TIMED_OUT") {
+                console.error(
+                  "❌ REALTIME TIMED OUT"
                 );
+      
+                updateConnectionStatus("offline");
               }
-            }
+      
+              if (status === "CLOSED") {
+                console.warn(
+                  "⚠️ REALTIME CLOSED"
+                );
+      
+                updateConnectionStatus("offline");
+              }
+            });
+      
+        } catch (error) {
+      
+          console.error(
+            "❌ REALTIME SETUP FAILED:",
+            error
           );
-    }
-
+      
+          updateConnectionStatus("offline");
+        }
+      }
 
     function handleRealtimeMessage(message) {
 
