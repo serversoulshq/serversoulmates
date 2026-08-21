@@ -111,17 +111,48 @@ app.get("/api/profile/status", auth, async (req, res) => {
 
 // Save / update own profile
 app.post("/api/profile/save", auth, async (req, res) => {
-  const allowed = ["first_name", "dob", "gender", "looking_for", "year", "major", "home_state", "hostel", "prompt_question", "prompt_answer"];
-  const update = {};
-  for (const key of allowed) {
-    if (req.body[key] !== undefined) update[key] = req.body[key];
-  }
-  update.id = req.user.id;
-  update.email = req.user.email;
+  const allowed = [
+    "first_name",
+    "gender",
+    "looking_for",
+    "year",
+    "major",
+    "home_state",
+    "hostel",
+    "prompt_question",
+    "prompt_answer"
+  ];
 
-  const { error } = await sb.from("profiles").upsert(update, { onConflict: "id" });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true });
+  const update = {};
+
+  for (const key of allowed) {
+    if (req.body[key] !== undefined) {
+      update[key] = req.body[key];
+    }
+  }
+
+  // IMPORTANT:
+  // Use UPDATE, not UPSERT.
+  // This preserves the existing DOB and all other
+  // fields that are not being edited.
+  const { data, error } = await sb
+    .from("profiles")
+    .update(update)
+    .eq("id", req.user.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("PROFILE UPDATE ERROR:", error);
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+
+  res.json({
+    success: true,
+    profile: data
+  });
 });
 
 // ════════════════════════════════════════════
