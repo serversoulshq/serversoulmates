@@ -1437,16 +1437,15 @@
 
       async function subscribeRealtime() {
         try {
-          // Remove previous subscription
           if (realtimeChannel) {
             await _sb.removeChannel(realtimeChannel);
             realtimeChannel = null;
           }
       
-          console.log("Starting realtime for match:", matchId);
+          console.log("Starting realtime:", matchId);
       
           realtimeChannel = _sb
-            .channel(`messages-${matchId}`)
+            .channel("chat-" + matchId)
       
             .on(
               "postgres_changes",
@@ -1455,12 +1454,13 @@
                 schema: "public",
                 table: "messages"
               },
-              (payload) => {
-                console.log("🔥 REALTIME EVENT:", payload);
+              function (payload) {
+                console.log("REALTIME EVENT:", payload);
       
                 const message = payload.new;
       
-                // Only accept messages belonging to this chat
+                if (!message) return;
+      
                 if (
                   String(message.match_id) !==
                   String(matchId)
@@ -1472,7 +1472,6 @@
       
                 const id = String(message.id);
       
-                // Prevent duplicates
                 if (messages.has(id)) {
                   return;
                 }
@@ -1483,44 +1482,26 @@
                   forceScroll: true
                 });
       
-                console.log("✅ New message displayed");
+                console.log("New message displayed");
               }
             )
       
-            .subscribe((status) => {
-      
-              console.log(
-                "📡 REALTIME STATUS:",
-                status
-              );
+            .subscribe(function (status) {
+              console.log("REALTIME STATUS:", status);
       
               if (status === "SUBSCRIBED") {
-                console.log(
-                  "✅ REALTIME CONNECTED!"
-                );
-      
+                console.log("REALTIME CONNECTED");
                 updateConnectionStatus("online");
               }
       
-              if (status === "CHANNEL_ERROR") {
+              if (
+                status === "CHANNEL_ERROR" ||
+                status === "TIMED_OUT" ||
+                status === "CLOSED"
+              ) {
                 console.error(
-                  "❌ REALTIME CHANNEL ERROR"
-                );
-      
-                updateConnectionStatus("offline");
-              }
-      
-              if (status === "TIMED_OUT") {
-                console.error(
-                  "❌ REALTIME TIMED OUT"
-                );
-      
-                updateConnectionStatus("offline");
-              }
-      
-              if (status === "CLOSED") {
-                console.warn(
-                  "⚠️ REALTIME CLOSED"
+                  "Realtime connection problem:",
+                  status
                 );
       
                 updateConnectionStatus("offline");
@@ -1528,9 +1509,8 @@
             });
       
         } catch (error) {
-      
           console.error(
-            "❌ REALTIME SETUP FAILED:",
+            "Realtime setup failed:",
             error
           );
       
