@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>Server Souls — Chat</title>
 
@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet"
-  />
+  >
 
   <style>
     :root {
@@ -19,18 +19,13 @@
       --surface: #10101c;
       --surface2: #161624;
       --surface3: #1c1c2e;
-
-      --border: rgba(255, 255, 255, 0.07);
+      --border: rgba(255,255,255,.07);
 
       --text: #ede9e4;
       --muted: #7a7890;
 
       --accent: #c2607a;
       --accent-light: #e8859a;
-      --accent-glow: rgba(194, 96, 122, 0.15);
-
-      --bubble-me: #c2607a;
-      --bubble-them: #161624;
 
       --success: #4caf7d;
       --danger: #df6b75;
@@ -56,9 +51,9 @@
     }
 
     body {
-      font-family: var(--font-body);
       background: var(--bg);
       color: var(--text);
+      font-family: var(--font-body);
     }
 
     button,
@@ -67,14 +62,7 @@
       font: inherit;
     }
 
-    button,
-    a {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* =========================================================
-       HEADER
-    ========================================================= */
+    /* ================= HEADER ================= */
 
     .chat-header {
       position: fixed;
@@ -87,16 +75,11 @@
 
       display: flex;
       align-items: center;
-
       gap: 12px;
 
-      padding:
-        env(safe-area-inset-top)
-        16px
-        0
-        16px;
+      padding: 0 16px;
 
-      background: rgba(8, 8, 16, 0.92);
+      background: rgba(8,8,16,.94);
 
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -108,14 +91,13 @@
       width: 36px;
       height: 36px;
 
-      border-radius: 50%;
-
       display: flex;
       align-items: center;
       justify-content: center;
 
-      color: var(--muted);
+      border-radius: 50%;
 
+      color: var(--muted);
       background: var(--surface2);
 
       border: 1px solid var(--border);
@@ -123,20 +105,10 @@
       text-decoration: none;
 
       flex-shrink: 0;
-
-      transition:
-        color 0.2s,
-        border-color 0.2s,
-        transform 0.15s;
     }
 
     .back-btn:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .back-btn:active {
-      transform: scale(0.94);
     }
 
     .chat-avatar {
@@ -144,7 +116,6 @@
       height: 40px;
 
       border-radius: 50%;
-
       overflow: hidden;
 
       background: var(--surface2);
@@ -157,13 +128,11 @@
     .chat-avatar img {
       width: 100%;
       height: 100%;
-
       object-fit: cover;
-
       display: block;
     }
 
-    .chat-avatar-placeholder {
+    .avatar-placeholder {
       width: 100%;
       height: 100%;
 
@@ -194,17 +163,15 @@
     .chat-status {
       margin-top: 2px;
 
-      font-size: 11px;
       color: var(--muted);
-
-      transition: color 0.2s;
+      font-size: 11px;
     }
 
     .chat-status.online {
       color: var(--success);
     }
 
-    .chat-status.error {
+    .chat-status.offline {
       color: var(--danger);
     }
 
@@ -214,30 +181,21 @@
       border-radius: 8px;
 
       background: transparent;
-
       border: 1px solid var(--border);
 
       color: var(--muted);
 
       font-size: 12px;
-
       text-decoration: none;
 
       white-space: nowrap;
-
-      transition:
-        color 0.2s,
-        border-color 0.2s;
     }
 
     .view-profile-btn:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.16);
     }
 
-    /* =========================================================
-       MESSAGE AREA
-    ========================================================= */
+    /* ================= MESSAGES ================= */
 
     .messages-area {
       position: fixed;
@@ -251,10 +209,7 @@
       overflow-y: auto;
       overflow-x: hidden;
 
-      padding: 18px 18px 24px;
-
-      display: flex;
-      flex-direction: column;
+      padding: 18px;
 
       scroll-behavior: smooth;
 
@@ -266,53 +221,38 @@
       width: 5px;
     }
 
-    .messages-area::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
     .messages-area::-webkit-scrollbar-thumb {
       background: var(--surface3);
       border-radius: 10px;
     }
 
-    /* =========================================================
-       DATE DIVIDER
-    ========================================================= */
-
     .date-divider {
-      align-self: center;
+      width: fit-content;
 
-      margin: 12px 0 14px;
+      margin: 12px auto 14px;
 
       padding: 5px 10px;
 
       border-radius: 20px;
 
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(255,255,255,.035);
 
       color: var(--muted);
 
       font-size: 10px;
-
-      letter-spacing: 0.05em;
     }
-
-    /* =========================================================
-       MESSAGE ROW
-    ========================================================= */
 
     .msg-row {
       width: 100%;
 
       display: flex;
-
       align-items: flex-end;
 
       gap: 7px;
 
       margin-bottom: 5px;
 
-      animation: messageIn 0.18s ease-out;
+      animation: messageIn .18s ease-out;
     }
 
     @keyframes messageIn {
@@ -351,9 +291,6 @@
     .msg-avatar img {
       width: 100%;
       height: 100%;
-
-      display: block;
-
       object-fit: cover;
     }
 
@@ -374,54 +311,42 @@
       font-size: 14px;
       line-height: 1.5;
 
-      word-wrap: break-word;
+      word-break: break-word;
       overflow-wrap: anywhere;
-
-      white-space: normal;
     }
 
     .msg-row.them .bubble {
-      background: var(--bubble-them);
+      background: var(--surface2);
 
       border: 1px solid var(--border);
-
-      color: var(--text);
 
       border-bottom-left-radius: 5px;
     }
 
     .msg-row.me .bubble {
-      background: var(--bubble-me);
+      background: var(--accent);
 
-      color: #fff;
+      color: white;
 
       border-bottom-right-radius: 5px;
-
-      box-shadow: 0 4px 18px rgba(194, 96, 122, 0.08);
     }
 
     .bubble-time {
       margin-top: 3px;
-
       padding: 0 3px;
 
-      font-size: 9px;
-
       color: var(--muted);
+      font-size: 9px;
     }
 
     .msg-row.me .bubble-time {
       text-align: right;
     }
 
-    /* =========================================================
-       EMPTY / MATCH CARD
-    ========================================================= */
+    /* ================= EMPTY STATE ================= */
 
     .match-card {
       width: min(100%, 430px);
-
-      align-self: center;
 
       margin: 12px auto 18px;
 
@@ -434,8 +359,6 @@
       border-radius: 18px;
 
       text-align: center;
-
-      animation: messageIn 0.25s ease-out;
     }
 
     .match-card-avatar {
@@ -457,44 +380,25 @@
       width: 100%;
       height: 100%;
 
-      display: block;
-
       object-fit: cover;
-    }
-
-    .match-card-avatar-placeholder {
-      width: 100%;
-      height: 100%;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-family: var(--font-display);
-      font-size: 30px;
-
-      color: var(--muted);
     }
 
     .match-card-name {
       font-family: var(--font-display);
 
       font-size: 23px;
-
       font-style: italic;
 
       margin-bottom: 4px;
     }
 
     .match-card-sub {
-      font-size: 12px;
-
       color: var(--muted);
+      font-size: 12px;
     }
 
     .match-card-tags {
       display: flex;
-
       flex-wrap: wrap;
 
       justify-content: center;
@@ -513,42 +417,36 @@
 
       border: 1px solid var(--border);
 
-      font-size: 10px;
-
       color: var(--muted);
+
+      font-size: 10px;
     }
 
     .empty-chat {
-      align-self: center;
-
       text-align: center;
 
       padding: 25px 20px 40px;
     }
 
     .empty-chat p {
-      font-family: var(--font-display);
-
-      font-style: italic;
-
-      font-size: 19px;
+      margin-bottom: 5px;
 
       color: var(--muted);
 
-      margin-bottom: 5px;
+      font-family: var(--font-display);
+
+      font-size: 19px;
+      font-style: italic;
     }
 
     .empty-chat small {
       color: var(--muted);
-
-      opacity: 0.6;
+      opacity: .6;
 
       font-size: 11px;
     }
 
-    /* =========================================================
-       LOADING
-    ========================================================= */
+    /* ================= LOADING ================= */
 
     .loading-container {
       position: absolute;
@@ -556,7 +454,6 @@
       inset: 0;
 
       display: flex;
-
       align-items: center;
       justify-content: center;
     }
@@ -566,12 +463,11 @@
       height: 28px;
 
       border: 2px solid var(--border);
-
       border-top-color: var(--accent);
 
       border-radius: 50%;
 
-      animation: spin 0.7s linear infinite;
+      animation: spin .7s linear infinite;
     }
 
     @keyframes spin {
@@ -580,9 +476,7 @@
       }
     }
 
-    /* =========================================================
-       ERROR
-    ========================================================= */
+    /* ================= ERROR ================= */
 
     .error-state {
       width: min(100%, 420px);
@@ -594,79 +488,69 @@
       padding: 30px;
     }
 
-    .error-state-icon {
+    .error-icon {
       font-size: 28px;
-
       margin-bottom: 10px;
     }
 
-    .error-state-title {
+    .error-title {
       font-family: var(--font-display);
 
       font-size: 21px;
-
       font-style: italic;
 
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
-    .error-state-text {
+    .error-text {
       color: var(--muted);
 
       font-size: 12px;
-
       line-height: 1.6;
 
       margin-bottom: 16px;
     }
 
     .retry-btn {
-      border: 1px solid var(--border);
-
-      background: var(--surface2);
-
-      color: var(--text);
+      padding: 9px 16px;
 
       border-radius: 10px;
 
-      padding: 9px 16px;
+      background: var(--surface2);
+
+      border: 1px solid var(--border);
+
+      color: var(--text);
 
       cursor: pointer;
 
       font-size: 12px;
     }
 
-    .retry-btn:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    /* =========================================================
-       COMPOSER
-    ========================================================= */
+    /* ================= COMPOSER ================= */
 
     .input-bar {
       position: fixed;
 
-      bottom: 0;
       left: 0;
       right: 0;
+      bottom: 0;
+
+      z-index: 100;
 
       min-height: var(--composer-height);
 
-      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+
+      gap: 9px;
 
       padding:
         10px
         16px
         calc(10px + env(safe-area-inset-bottom));
 
-      display: flex;
-
-      align-items: flex-end;
-
-      gap: 9px;
-
-      background: rgba(8, 8, 16, 0.94);
+      background: rgba(8,8,16,.95);
 
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -698,82 +582,60 @@
 
       overflow-y: auto;
 
-      font-family: var(--font-body);
-
       font-size: 14px;
-
       line-height: 1.5;
+    }
 
-      transition: border-color 0.2s;
+    .msg-input:focus {
+      border-color: rgba(194,96,122,.45);
     }
 
     .msg-input::placeholder {
       color: var(--muted);
-
-      opacity: 0.65;
-    }
-
-    .msg-input:focus {
-      border-color: rgba(194, 96, 122, 0.45);
     }
 
     .send-btn {
       width: 44px;
       height: 44px;
 
-      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
 
       border: none;
+      border-radius: 50%;
 
       background: var(--accent);
 
       color: white;
 
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
       cursor: pointer;
-
-      flex-shrink: 0;
-
-      transition:
-        background 0.2s,
-        transform 0.12s,
-        opacity 0.2s;
-    }
-
-    .send-btn:hover:not(:disabled) {
-      background: var(--accent-light);
-    }
-
-    .send-btn:active:not(:disabled) {
-      transform: scale(0.91);
     }
 
     .send-btn:disabled {
-      opacity: 0.35;
-
+      opacity: .35;
       cursor: not-allowed;
+    }
+
+    .send-btn:not(:disabled):active {
+      transform: scale(.92);
     }
 
     .send-spinner {
       width: 16px;
       height: 16px;
 
-      border: 2px solid rgba(255, 255, 255, 0.35);
-
-      border-top-color: #fff;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: white;
 
       border-radius: 50%;
 
-      animation: spin 0.65s linear infinite;
+      animation: spin .65s linear infinite;
     }
 
-    /* =========================================================
-       TOAST
-    ========================================================= */
+    /* ================= TOAST ================= */
 
     .toast {
       position: fixed;
@@ -793,7 +655,7 @@
 
       background: #221419;
 
-      border: 1px solid rgba(223, 107, 117, 0.28);
+      border: 1px solid rgba(223,107,117,.28);
 
       color: #ffd9dc;
 
@@ -803,22 +665,18 @@
 
       pointer-events: none;
 
-      transition:
-        opacity 0.2s,
-        transform 0.2s;
+      transition: .2s;
     }
 
     .toast.show {
       opacity: 1;
-
       transform: translate(-50%, 0);
     }
 
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
+    /* ================= MOBILE ================= */
 
     @media (max-width: 600px) {
+
       :root {
         --header-height: 60px;
         --composer-height: 70px;
@@ -847,24 +705,9 @@
         max-width: 82%;
       }
 
-      .bubble {
-        font-size: 14px;
-        padding: 9px 12px;
-      }
-
       .input-bar {
         padding-left: 9px;
         padding-right: 9px;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .message-content {
-        max-width: 86%;
-      }
-
-      .chat-name {
-        font-size: 14px;
       }
     }
   </style>
@@ -872,16 +715,14 @@
 
 <body>
 
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
+  <!-- HEADER -->
 
   <header class="chat-header">
 
     <a
-      class="back-btn"
       href="/matches"
-      aria-label="Back to matches"
+      class="back-btn"
+      aria-label="Back"
     >
       <svg
         width="16"
@@ -897,39 +738,46 @@
       </svg>
     </a>
 
-    <div class="chat-avatar" id="headerAvatarContainer">
-      <div class="chat-avatar-placeholder" id="headerAvatarPlaceholder">
-        •
-      </div>
+    <div class="chat-avatar">
 
       <img
         id="headerAvatar"
         src=""
         alt=""
         style="display:none;"
-      />
+      >
+
+      <div
+        id="headerAvatarPlaceholder"
+        class="avatar-placeholder"
+      >
+        •
+      </div>
+
     </div>
 
     <div class="chat-info">
+
       <div
-        class="chat-name"
         id="headerName"
+        class="chat-name"
       >
         Loading...
       </div>
 
       <div
-        class="chat-status"
         id="headerStatus"
+        class="chat-status"
       >
         Connecting...
       </div>
+
     </div>
 
     <a
-      class="view-profile-btn"
       id="viewProfileBtn"
       href="#"
+      class="view-profile-btn"
     >
       View profile
     </a>
@@ -937,13 +785,11 @@
   </header>
 
 
-  <!-- =========================================================
-       MESSAGES
-  ========================================================== -->
+  <!-- MESSAGES -->
 
   <main
-    class="messages-area"
     id="messagesArea"
+    class="messages-area"
     aria-live="polite"
   >
 
@@ -954,30 +800,28 @@
   </main>
 
 
-  <!-- =========================================================
-       MESSAGE COMPOSER
-  ========================================================== -->
+  <!-- COMPOSER -->
 
   <div class="input-bar">
 
     <textarea
-      class="msg-input"
       id="msgInput"
+      class="msg-input"
       rows="1"
       maxlength="1000"
       placeholder="Message..."
       autocomplete="off"
       spellcheck="true"
-      aria-label="Message"
     ></textarea>
 
     <button
-      class="send-btn"
       id="sendBtn"
+      class="send-btn"
       type="button"
       disabled
       aria-label="Send message"
     >
+
       <svg
         id="sendIcon"
         width="16"
@@ -989,58 +833,59 @@
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        <line
+          x1="22"
+          y1="2"
+          x2="11"
+          y2="13"
+        ></line>
+
+        <polygon
+          points="22 2 15 22 11 13 2 9 22 2"
+        ></polygon>
+
       </svg>
+
     </button>
 
   </div>
 
 
   <div
-    class="toast"
     id="toast"
-    role="alert"
+    class="toast"
   ></div>
 
 
-  <!-- =========================================================
-       YOUR EXISTING APP.JS
-  ========================================================== -->
+  <!-- YOUR EXISTING APP.JS -->
 
   <script src="/app.js"></script>
 
+
   <script>
-    /*
-     * ============================================================
-     * SERVER SOULS CHAT
-     *
-     * Uses your existing:
-     *
-     * GET  /api/matches
-     * GET  /api/messages/:matchId
-     * POST /api/messages/:matchId
-     *
-     * Supabase Realtime is used for incoming messages.
-     * ============================================================
-     */
 
     "use strict";
 
 
-    /* ============================================================
+    /* =========================================================
        STATE
-    ============================================================ */
+    ========================================================= */
 
-    const params = new URLSearchParams(window.location.search);
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
 
-    const matchId = params.get("id");
+    const matchId =
+      params.get("id");
+
 
     let myUserId = null;
 
     let otherProfile = null;
 
-    let messages = new Map();
+    let messages =
+      new Map();
 
     let realtimeChannel = null;
 
@@ -1048,140 +893,165 @@
 
     let isSending = false;
 
-    let isInitialized = false;
-
     let toastTimer = null;
 
 
-    /* ============================================================
+    /* =========================================================
        DOM
-    ============================================================ */
+    ========================================================= */
 
     const messagesArea =
-      document.getElementById("messagesArea");
+      document.getElementById(
+        "messagesArea"
+      );
 
     const msgInput =
-      document.getElementById("msgInput");
+      document.getElementById(
+        "msgInput"
+      );
 
     const sendBtn =
-      document.getElementById("sendBtn");
+      document.getElementById(
+        "sendBtn"
+      );
 
     const sendIcon =
-      document.getElementById("sendIcon");
+      document.getElementById(
+        "sendIcon"
+      );
 
     const headerAvatar =
-      document.getElementById("headerAvatar");
+      document.getElementById(
+        "headerAvatar"
+      );
 
     const headerAvatarPlaceholder =
-      document.getElementById("headerAvatarPlaceholder");
+      document.getElementById(
+        "headerAvatarPlaceholder"
+      );
 
     const headerName =
-      document.getElementById("headerName");
+      document.getElementById(
+        "headerName"
+      );
 
     const headerStatus =
-      document.getElementById("headerStatus");
+      document.getElementById(
+        "headerStatus"
+      );
 
     const viewProfileBtn =
-      document.getElementById("viewProfileBtn");
+      document.getElementById(
+        "viewProfileBtn"
+      );
 
 
-    /* ============================================================
-       START
-    ============================================================ */
+    /* =========================================================
+       INIT
+    ========================================================= */
 
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener(
+      "DOMContentLoaded",
+      init
+    );
 
 
     async function init() {
 
       if (!matchId) {
 
-        window.location.href = "/matches";
+        window.location.href =
+          "/matches";
 
         return;
       }
 
+
       try {
 
-        const token = await requireAuth();
+        /*
+         * Your existing app.js provides requireAuth()
+         */
+
+        const token =
+          await requireAuth();
+
 
         if (!token) return;
 
 
         /*
-         * Get authenticated Supabase user.
+         * Get current Supabase user.
          */
 
         const {
           data,
           error
-        } = await _sb.auth.getUser();
+        } =
+          await _sb.auth.getUser();
 
-        if (error || !data || !data.user) {
 
-          window.location.href = "/";
+        if (
+          error ||
+          !data ||
+          !data.user
+        ) {
+
+          window.location.href =
+            "/";
 
           return;
         }
 
-        myUserId = data.user.id;
 
+        myUserId =
+          data.user.id;
 
-        /*
-         * Wire UI.
-         */
 
         setupInput();
 
         setupAuthListener();
 
 
-        /*
-         * Load the conversation.
-         */
-
         await loadMatchInfo();
 
         await loadMessages();
 
-
         /*
-         * Start realtime only AFTER
-         * initial messages have been loaded.
-         *
-         * This prevents most duplicate/render races.
+         * IMPORTANT:
+         * Subscribe AFTER loading history.
          */
 
         await subscribeRealtime();
 
 
-        isInitialized = true;
-
-        updateConnectionStatus("online");
-
       } catch (error) {
 
         console.error(
-          "Chat initialization error:",
+          "Chat initialization failed:",
           error
         );
 
+
         showFatalError(
           error.message ||
-          "Unable to load this conversation."
+          "Unable to load chat."
         );
       }
     }
 
 
-    /* ============================================================
-       AUTH LISTENER
-    ============================================================ */
+    /* =========================================================
+       AUTH
+    ========================================================= */
 
     function setupAuthListener() {
 
       _sb.auth.onAuthStateChange(
-        async (event, session) => {
+        (
+          event,
+          session
+        ) => {
 
           if (
             event === "SIGNED_OUT" ||
@@ -1190,34 +1060,41 @@
 
             cleanupRealtime();
 
-            window.location.href = "/";
+            window.location.href =
+              "/";
 
             return;
           }
 
+
           if (
-            event === "TOKEN_REFRESHED" &&
             session.user
           ) {
 
-            myUserId = session.user.id;
+            myUserId =
+              session.user.id;
           }
+
         }
       );
     }
 
 
-    /* ============================================================
-       MATCH INFORMATION
-    ============================================================ */
+    /* =========================================================
+       MATCH INFO
+    ========================================================= */
 
     async function loadMatchInfo() {
 
       const matches =
-        await api("/api/matches");
+        await api(
+          "/api/matches"
+        );
 
 
-      if (!Array.isArray(matches)) {
+      if (
+        !Array.isArray(matches)
+      ) {
 
         throw new Error(
           "Invalid matches response."
@@ -1225,17 +1102,12 @@
       }
 
 
-      /*
-       * Match IDs are UUID strings.
-       *
-       * Compare as strings to avoid accidental
-       * UUID/object/type mismatches.
-       */
-
       const match =
         matches.find(
           item =>
-            String(item.match_id) ===
+            String(
+              item.match_id
+            ) ===
             String(matchId)
         );
 
@@ -1243,7 +1115,7 @@
       if (!match) {
 
         throw new Error(
-          "This match no longer exists."
+          "This match could not be found."
         );
       }
 
@@ -1251,12 +1123,13 @@
       if (!match.profile) {
 
         throw new Error(
-          "The matched profile could not be loaded."
+          "Matched profile could not be loaded."
         );
       }
 
 
-      otherProfile = match.profile;
+      otherProfile =
+        match.profile;
 
 
       renderHeader();
@@ -1272,12 +1145,13 @@
 
       const age =
         otherProfile.age != null
-          ? `, ${otherProfile.age}`
+          ? ", " +
+            otherProfile.age
           : "";
 
 
       headerName.textContent =
-        `${firstName}${age}`;
+        firstName + age;
 
 
       headerStatus.textContent =
@@ -1285,16 +1159,15 @@
         "IISERB";
 
 
-      /*
-       * Profile route used by your project.
-       */
-
-      if (otherProfile.id) {
+      if (
+        otherProfile.id
+      ) {
 
         viewProfileBtn.href =
-          `/profile?uid=${encodeURIComponent(
+          "/profile?uid=" +
+          encodeURIComponent(
             otherProfile.id
-          )}`;
+          );
 
       } else {
 
@@ -1303,16 +1176,15 @@
       }
 
 
-      const photo =
-        otherProfile.photo;
+      if (
+        otherProfile.photo
+      ) {
 
-
-      if (photo) {
-
-        headerAvatar.src = photo;
+        headerAvatar.src =
+          otherProfile.photo;
 
         headerAvatar.alt =
-          `${firstName}'s profile photo`;
+          firstName;
 
         headerAvatar.style.display =
           "block";
@@ -1329,14 +1201,16 @@
           "flex";
 
         headerAvatarPlaceholder.textContent =
-          getInitials(firstName);
+          getInitials(
+            firstName
+          );
       }
     }
 
 
-    /* ============================================================
-       LOAD HISTORY
-    ============================================================ */
+    /* =========================================================
+       LOAD MESSAGES
+    ========================================================= */
 
     async function loadMessages() {
 
@@ -1347,13 +1221,16 @@
 
         const data =
           await api(
-            `/api/messages/${encodeURIComponent(
+            "/api/messages/" +
+            encodeURIComponent(
               matchId
-            )}`
+            )
           );
 
 
-        if (!Array.isArray(data)) {
+        if (
+          !Array.isArray(data)
+        ) {
 
           throw new Error(
             "Invalid messages response."
@@ -1364,15 +1241,9 @@
         messages.clear();
 
 
-        /*
-         * Store messages by ID.
-         *
-         * This is important because Realtime can
-         * sometimes deliver an INSERT that was
-         * already returned by POST.
-         */
-
-        for (const message of data) {
+        for (
+          const message of data
+        ) {
 
           if (
             message &&
@@ -1380,36 +1251,18 @@
           ) {
 
             messages.set(
-              String(message.id),
+              String(
+                message.id
+              ),
               message
             );
           }
         }
 
 
-        renderMessages({
-          forceScroll: true
-        });
-
-
-      } catch (error) {
-
-        console.error(
-          "Loading messages failed:",
-          error
+        renderMessages(
+          true
         );
-
-        showError(
-          "Couldn't load your messages."
-        );
-
-
-        renderErrorState(
-          "Couldn't load messages",
-          "Check your connection and try again."
-        );
-
-        throw error;
 
       } finally {
 
@@ -1418,190 +1271,239 @@
     }
 
 
-    /* ============================================================
+    /* =========================================================
        REALTIME
-    ============================================================ */
+       
+       THERE IS ONLY ONE subscribeRealtime()
+       ========================================================= */
 
     async function subscribeRealtime() {
+
+      console.log(
+        "Starting realtime for match:",
+        matchId
+      );
+
 
       cleanupRealtime();
 
 
-      /*
-       * Supabase channel names must be unique.
-       */
+      try {
 
-      const channelName =
-        `server-souls-chat-${matchId}-${myUserId}`;
+        realtimeChannel =
+          _sb.channel(
+            "server-souls-chat-" +
+            matchId +
+            "-" +
+            myUserId
+          );
 
 
-      async function subscribeRealtime() {
-        try {
-          cleanupRealtime();
-      
-          console.log("Starting realtime for match:", matchId);
-      
-          realtimeChannel = _sb
-            .channel(`server-souls-chat-${matchId}-${myUserId}`)
-      
-            .on(
-              "postgres_changes",
-              {
-                event: "INSERT",
-                schema: "public",
-                table: "messages"
-              },
-              function (payload) {
-                console.log("🔥 REALTIME EVENT:", payload);
-      
-                const message = payload.new;
-      
-                if (!message) return;
-      
-                // Only process messages for this chat
-                if (
-                  String(message.match_id) !==
-                  String(matchId)
-                ) {
-                  return;
-                }
-      
-                if (!message.id) return;
-      
-                const id = String(message.id);
-      
-                // Prevent duplicates
-                if (messages.has(id)) {
-                  return;
-                }
-      
-                messages.set(id, message);
-      
-                renderMessages({
-                  forceScroll: true
-                });
-      
-                console.log("✅ New message displayed");
-              }
-            )
-      
-            .subscribe(function (status) {
-              console.log("📡 REALTIME STATUS:", status);
-      
-              if (status === "SUBSCRIBED") {
-                console.log("✅ REALTIME CONNECTED");
-                updateConnectionStatus("online");
-              }
-      
-              if (
-                status === "CHANNEL_ERROR" ||
-                status === "TIMED_OUT"
-              ) {
-                console.error(
-                  "❌ REALTIME CONNECTION ERROR:",
-                  status
-                );
-      
-                updateConnectionStatus("offline");
-      
-                scheduleRealtimeRetry();
-              }
-      
-              if (status === "CLOSED") {
-                console.warn("⚠️ REALTIME CLOSED");
-      
-                updateConnectionStatus("offline");
-      
-                scheduleRealtimeRetry();
-              }
-            });
-      
+        realtimeChannel.on(
+          "postgres_changes",
+
+          {
+            event: "INSERT",
+
+            schema: "public",
+
+            table: "messages"
+          },
+
+          function(payload) {
+
+            console.log(
+              "🔥 REALTIME EVENT:",
+              payload
+            );
+
+
+            const message =
+              payload.new;
+
+
+            if (!message) {
+              return;
+            }
+
+
+            /*
+             * Only process messages
+             * belonging to this chat.
+             */
+
+            if (
+              String(
+                message.match_id
+              ) !==
+              String(matchId)
+            ) {
+
+              return;
+            }
+
+
+            if (!message.id) {
+              return;
+            }
+
+
+            const id =
+              String(
+                message.id
+              );
+
+
+            /*
+             * Prevent duplicate messages.
+             */
+
+            if (
+              messages.has(id)
+            ) {
+
+              return;
+            }
+
+
+            messages.set(
+              id,
+              message
+            );
+
+
+            renderMessages(
+              true
+            );
+
+
+            console.log(
+              "✅ MESSAGE RECEIVED LIVE"
+            );
+
+          }
+        );
+
+
+        realtimeChannel.subscribe(
+          function(status) {
+
+            console.log(
+              "📡 REALTIME STATUS:",
+              status
+            );
+
+
+            if (
+              status ===
+              "SUBSCRIBED"
+            ) {
+
+              console.log(
+                "✅ REALTIME CONNECTED"
+              );
+
+
+              updateConnectionStatus(
+                "online"
+              );
+
+
+              clearTimeout(
+                realtimeRetryTimer
+              );
+
+
+              return;
+            }
+
+
+            if (
+              status ===
+              "CHANNEL_ERROR"
+            ) {
+
+              console.error(
+                "❌ REALTIME CHANNEL ERROR"
+              );
+
+
+              updateConnectionStatus(
+                "offline"
+              );
+
+
+              scheduleRealtimeRetry();
+
+
+              return;
+            }
+
+
+            if (
+              status ===
+              "TIMED_OUT"
+            ) {
+
+              console.error(
+                "❌ REALTIME TIMED OUT"
+              );
+
+
+              updateConnectionStatus(
+                "offline"
+              );
+
+
+              scheduleRealtimeRetry();
+
+
+              return;
+            }
+
+
+            if (
+              status ===
+              "CLOSED"
+            ) {
+
+              console.warn(
+                "⚠️ REALTIME CLOSED"
+              );
+
+
+              updateConnectionStatus(
+                "offline"
+              );
+
+
+              scheduleRealtimeRetry();
+            }
+
+          }
+        );
+
       } catch (error) {
+
         console.error(
-          "Realtime setup failed:",
+          "❌ REALTIME SETUP FAILED:",
           error
         );
 
-        updateConnectionStatus("offline");
+
+        updateConnectionStatus(
+          "offline"
+        );
+
+
+        scheduleRealtimeRetry();
       }
     }
 
-    } // ← ADD THIS
-    
-    function handleRealtimeMessage(message) {
 
-      if (
-        !message ||
-        !message.id
-      ) {
-
-        return;
-      }
-
-
-      const id =
-        String(message.id);
-
-
-      /*
-       * Duplicate protection.
-       */
-
-      if (messages.has(id)) {
-
-        return;
-      }
-
-
-      /*
-       * Make sure this really belongs
-       * to this conversation.
-       */
-
-      if (
-        String(message.match_id) !==
-        String(matchId)
-      ) {
-
-        return;
-      }
-
-
-      messages.set(
-        id,
-        message
-      );
-
-
-      /*
-       * Check whether user is already near
-       * the bottom before rendering.
-       */
-
-      const shouldScroll =
-        isNearBottom();
-
-
-      renderMessages({
-        forceScroll: shouldScroll
-      });
-
-
-      /*
-       * If the incoming message is from the
-       * other person and the user isn't looking
-       * at the bottom, show a small notification.
-       */
-
-      if (
-        message.sender_id !== myUserId &&
-        !shouldScroll
-      ) {
-
-        showToast("New message");
-      }
-    }
-
+    /* =========================================================
+       REALTIME RETRY
+    ========================================================= */
 
     function scheduleRealtimeRetry() {
 
@@ -1612,26 +1514,14 @@
 
       realtimeRetryTimer =
         setTimeout(
-          async () => {
+          function() {
 
             if (
-              !document.hidden &&
-              myUserId
+              document.visibilityState ===
+              "visible"
             ) {
 
-              try {
-
-                await subscribeRealtime();
-
-              } catch (error) {
-
-                console.error(
-                  "Realtime reconnect failed:",
-                  error
-                );
-
-                scheduleRealtimeRetry();
-              }
+              subscribeRealtime();
             }
 
           },
@@ -1647,10 +1537,13 @@
       );
 
 
-      realtimeRetryTimer = null;
+      realtimeRetryTimer =
+        null;
 
 
-      if (realtimeChannel) {
+      if (
+        realtimeChannel
+      ) {
 
         try {
 
@@ -1666,35 +1559,42 @@
           );
         }
 
-        realtimeChannel = null;
+
+        realtimeChannel =
+          null;
       }
     }
 
 
-    /* ============================================================
+    /* =========================================================
        RENDER MESSAGES
-    ============================================================ */
+    ========================================================= */
 
-    function renderMessages({
-      forceScroll = false
-    } = {}) {
+    function renderMessages(
+      forceScroll
+    ) {
 
-      if (!otherProfile) {
+      const sorted =
+        Array.from(
+          messages.values()
+        ).sort(
+          function(a, b) {
 
-        return;
-      }
+            return (
+              new Date(
+                a.created_at
+              ) -
+              new Date(
+                b.created_at
+              )
+            );
+          }
+        );
 
 
-      const sortedMessages =
-        Array.from(messages.values())
-          .sort(
-            (a, b) =>
-              new Date(a.created_at) -
-              new Date(b.created_at)
-          );
-
-
-      if (!sortedMessages.length) {
+      if (
+        sorted.length === 0
+      ) {
 
         renderEmptyConversation();
 
@@ -1702,21 +1602,24 @@
       }
 
 
-      const wasNearBottom =
+      const shouldScroll =
+        forceScroll ||
         isNearBottom();
 
 
       let html = "";
 
-      let lastDateKey = "";
+      let lastDate = "";
 
 
       for (
-        const message of sortedMessages
+        const message of sorted
       ) {
 
         const date =
-          new Date(message.created_at);
+          new Date(
+            message.created_at
+          );
 
 
         const dateKey =
@@ -1725,19 +1628,24 @@
 
         if (
           dateKey !==
-          lastDateKey
+          lastDate
         ) {
 
           html +=
-            renderDateDivider(date);
+            renderDateDivider(
+              date
+            );
 
-          lastDateKey =
+
+          lastDate =
             dateKey;
         }
 
 
         html +=
-          renderMessage(message);
+          renderMessage(
+            message
+          );
       }
 
 
@@ -1746,8 +1654,7 @@
 
 
       if (
-        forceScroll ||
-        wasNearBottom
+        shouldScroll
       ) {
 
         scrollToBottom();
@@ -1755,15 +1662,21 @@
     }
 
 
-    function renderMessage(message) {
+    function renderMessage(
+      message
+    ) {
 
       const isMe =
-        message.sender_id ===
-        myUserId;
+        String(
+          message.sender_id
+        ) ===
+        String(myUserId);
 
 
       const date =
-        new Date(message.created_at);
+        new Date(
+          message.created_at
+        );
 
 
       const time =
@@ -1776,53 +1689,51 @@
         );
 
 
-      const content =
-        escapeHtml(
-          message.content || ""
-        );
+      let avatarHTML =
+        "";
 
 
-      const avatar =
-        otherProfile.photo;
+      if (!isMe) {
 
+        if (
+          otherProfile &&
+          otherProfile.photo
+        ) {
 
-      const avatarHTML =
-        !isMe
-          ? `
+          avatarHTML = `
             <div class="msg-avatar">
-              ${
-                avatar
-                  ? `
-                    <img
-                      src="${escapeAttribute(
-                        avatar
-                      )}"
-                      alt=""
-                      onerror="this.parentElement.style.display='none'"
-                    />
-                  `
-                  : `
-                    <div
-                      class="chat-avatar-placeholder"
-                      style="font-size:12px;"
-                    >
-                      ${escapeHtml(
-                        getInitials(
-                          otherProfile.first_name
-                        )
-                      )}
-                    </div>
-                  `
-              }
+              <img
+                src="${escapeAttribute(
+                  otherProfile.photo
+                )}"
+                alt=""
+              >
             </div>
-          `
-          : "";
+          `;
+
+        } else {
+
+          avatarHTML = `
+            <div class="msg-avatar">
+              <div class="avatar-placeholder">
+                ${escapeHtml(
+                  getInitials(
+                    otherProfile?.first_name
+                  )
+                )}
+              </div>
+            </div>
+          `;
+        }
+      }
 
 
       return `
         <div
           class="msg-row ${
-            isMe ? "me" : "them"
+            isMe
+              ? "me"
+              : "them"
           }"
           data-message-id="${escapeAttribute(
             message.id
@@ -1834,11 +1745,15 @@
           <div class="message-content">
 
             <div class="bubble">
-              ${content}
+              ${escapeHtml(
+                message.content || ""
+              )}
             </div>
 
             <div class="bubble-time">
-              ${escapeHtml(time)}
+              ${escapeHtml(
+                time
+              )}
             </div>
 
           </div>
@@ -1848,93 +1763,102 @@
     }
 
 
-    function renderDateDivider(date) {
+    function renderDateDivider(
+      date
+    ) {
 
       return `
         <div class="date-divider">
           ${escapeHtml(
-            formatDateDivider(date)
+            formatDateDivider(
+              date
+            )
           )}
         </div>
       `;
     }
 
 
-    /* ============================================================
+    /* =========================================================
        EMPTY CONVERSATION
-    ============================================================ */
+    ========================================================= */
 
     function renderEmptyConversation() {
 
-      const firstName =
-        otherProfile.first_name ||
+      const name =
+        otherProfile?.first_name ||
         "your match";
 
 
       const photo =
-        otherProfile.photo;
+        otherProfile?.photo;
+
+
+      let avatarHTML;
+
+
+      if (photo) {
+
+        avatarHTML = `
+          <img
+            src="${escapeAttribute(
+              photo
+            )}"
+            alt=""
+          >
+        `;
+
+      } else {
+
+        avatarHTML = `
+          <div
+            class="avatar-placeholder"
+          >
+            ${escapeHtml(
+              getInitials(
+                name
+              )
+            )}
+          </div>
+        `;
+      }
 
 
       const tags = [
-        otherProfile.year,
-        otherProfile.major,
-        otherProfile.hostel
+        otherProfile?.year,
+        otherProfile?.major,
+        otherProfile?.hostel
       ].filter(Boolean);
 
 
-      const avatarHTML =
-        photo
-          ? `
-            <img
-              src="${escapeAttribute(
-                photo
-              )}"
-              alt=""
-              onerror="
-                this.style.display='none';
-                this.nextElementSibling.style.display='flex';
-              "
-            />
-
-            <div
-              class="match-card-avatar-placeholder"
-              style="display:none;"
-            >
-              ${escapeHtml(
-                getInitials(firstName)
-              )}
-            </div>
-          `
-          : `
-            <div
-              class="match-card-avatar-placeholder"
-            >
-              ${escapeHtml(
-                getInitials(firstName)
-              )}
-            </div>
-          `;
+      let tagsHTML = "";
 
 
-      const tagsHTML =
+      if (
         tags.length
-          ? `
-            <div class="match-card-tags">
-              ${tags
-                .map(
-                  tag =>
-                    `
-                      <span class="match-tag">
-                        ${escapeHtml(
-                          String(tag)
-                        )}
-                      </span>
-                    `
-                )
-                .join("")}
-            </div>
-          `
-          : "";
+      ) {
+
+        tagsHTML = `
+          <div class="match-card-tags">
+
+            ${tags
+              .map(
+                function(tag) {
+
+                  return `
+                    <span class="match-tag">
+                      ${escapeHtml(
+                        String(tag)
+                      )}
+                    </span>
+                  `;
+                }
+              )
+              .join("")}
+
+          </div>
+        `;
+      }
 
 
       messagesArea.innerHTML = `
@@ -1946,15 +1870,16 @@
 
           <div class="match-card-name">
             ${escapeHtml(
-              firstName
+              name
             )}
             ${
-              otherProfile.age != null
-                ? `, ${escapeHtml(
+              otherProfile?.age != null
+                ? ", " +
+                  escapeHtml(
                     String(
                       otherProfile.age
                     )
-                  )}`
+                  )
                 : ""
             }
           </div>
@@ -1982,13 +1907,15 @@
     }
 
 
-    /* ============================================================
+    /* =========================================================
        SEND MESSAGE
-    ============================================================ */
+    ========================================================= */
 
     async function sendMessage() {
 
-      if (isSending) {
+      if (
+        isSending
+      ) {
 
         return;
       }
@@ -2004,74 +1931,62 @@
       }
 
 
-      if (content.length > 1000) {
-
-        showToast(
-          "Message is too long."
-        );
-
-        return;
-      }
+      isSending =
+        true;
 
 
-      isSending = true;
-
-      setSendingState(true);
-
-
-      /*
-       * Keep a copy so we can restore the
-       * text if the request fails.
-       */
-
-      const originalContent =
+      const original =
         content;
 
 
-      msgInput.value = "";
+      msgInput.value =
+        "";
 
-      resetInputHeight();
+
+      resetInput();
 
       updateSendButton();
+
+      setSendingState(
+        true
+      );
 
 
       try {
 
-        const createdMessage =
+        const created =
           await api(
-            `/api/messages/${encodeURIComponent(
+            "/api/messages/" +
+            encodeURIComponent(
               matchId
-            )}`,
+            ),
             {
               method: "POST",
 
               body: {
                 content:
-                  originalContent
+                  original
               }
             }
           );
 
 
         /*
-         * IMPORTANT:
+         * Display immediately from
+         * POST response.
          *
-         * The server response is immediately
-         * inserted into our local message map.
-         *
-         * Realtime may ALSO send the same row.
-         *
-         * The Map prevents duplication.
+         * Realtime may also deliver it,
+         * but Map prevents duplicates.
          */
 
         if (
-          createdMessage &&
-          createdMessage.id
+          created &&
+          created.id
         ) {
 
           const id =
             String(
-              createdMessage.id
+              created.id
             );
 
 
@@ -2081,32 +1996,26 @@
 
             messages.set(
               id,
-              createdMessage
+              created
             );
 
 
-            renderMessages({
-              forceScroll: true
-            });
+            renderMessages(
+              true
+            );
           }
         }
-
 
       } catch (error) {
 
         console.error(
-          "Send message failed:",
+          "Send failed:",
           error
         );
 
 
-        /*
-         * Restore message so user doesn't
-         * lose what they typed.
-         */
-
         msgInput.value =
-          originalContent;
+          original;
 
 
         autoResize(
@@ -2116,32 +2025,37 @@
 
         showToast(
           error.message ||
-          "Message couldn't be sent."
+          "Message could not be sent."
         );
-
 
       } finally {
 
-        isSending = false;
+        isSending =
+          false;
 
-        setSendingState(false);
+
+        setSendingState(
+          false
+        );
+
 
         updateSendButton();
+
 
         msgInput.focus();
       }
     }
 
 
-    /* ============================================================
+    /* =========================================================
        INPUT
-    ============================================================ */
+    ========================================================= */
 
     function setupInput() {
 
       msgInput.addEventListener(
         "input",
-        () => {
+        function() {
 
           autoResize(
             msgInput
@@ -2154,16 +2068,11 @@
 
       msgInput.addEventListener(
         "keydown",
-        event => {
-
-          /*
-           * Enter = send
-           *
-           * Shift + Enter = newline
-           */
+        function(event) {
 
           if (
-            event.key === "Enter" &&
+            event.key ===
+            "Enter" &&
             !event.shiftKey
           ) {
 
@@ -2185,7 +2094,9 @@
     }
 
 
-    function autoResize(element) {
+    function autoResize(
+      element
+    ) {
 
       element.style.height =
         "44px";
@@ -2199,7 +2110,7 @@
     }
 
 
-    function resetInputHeight() {
+    function resetInput() {
 
       msgInput.style.height =
         "44px";
@@ -2208,14 +2119,9 @@
 
     function updateSendButton() {
 
-      const hasText =
-        msgInput.value.trim().length >
-        0;
-
-
       sendBtn.disabled =
-        !hasText ||
-        isSending;
+        isSending ||
+        !msgInput.value.trim();
     }
 
 
@@ -2223,7 +2129,9 @@
       sending
     ) {
 
-      if (sending) {
+      if (
+        sending
+      ) {
 
         sendIcon.style.display =
           "none";
@@ -2239,6 +2147,7 @@
             document.createElement(
               "span"
             );
+
 
           spinner.className =
             "send-spinner";
@@ -2261,7 +2170,9 @@
           );
 
 
-        if (spinner) {
+        if (
+          spinner
+        ) {
 
           spinner.remove();
         }
@@ -2269,9 +2180,9 @@
     }
 
 
-    /* ============================================================
+    /* =========================================================
        LOADING
-    ============================================================ */
+    ========================================================= */
 
     function showLoading() {
 
@@ -2291,41 +2202,43 @@
         );
 
 
-      if (loader) {
+      if (
+        loader
+      ) {
 
         loader.remove();
       }
     }
 
 
-    /* ============================================================
-       ERROR STATES
-    ============================================================ */
+    /* =========================================================
+       ERROR
+    ========================================================= */
 
-    function renderErrorState(
-      title,
-      text
+    function showFatalError(
+      message
     ) {
 
       messagesArea.innerHTML = `
         <div class="error-state">
 
-          <div class="error-state-icon">
+          <div class="error-icon">
             ♡
           </div>
 
-          <div class="error-state-title">
-            ${escapeHtml(title)}
+          <div class="error-title">
+            Something went wrong
           </div>
 
-          <div class="error-state-text">
-            ${escapeHtml(text)}
+          <div class="error-text">
+            ${escapeHtml(
+              message
+            )}
           </div>
 
           <button
             class="retry-btn"
-            type="button"
-            onclick="retryChat()"
+            onclick="location.reload()"
           >
             Try again
           </button>
@@ -2335,130 +2248,51 @@
     }
 
 
-    async function retryChat() {
-
-      try {
-
-        await loadMatchInfo();
-
-        await loadMessages();
-
-        await subscribeRealtime();
-
-      } catch (error) {
-
-        console.error(
-          "Retry failed:",
-          error
-        );
-      }
-    }
-
-
-    function showFatalError(
-      message
-    ) {
-
-      hideLoading();
-
-
-      renderErrorState(
-        "Something went wrong",
-        message
-      );
-
-
-      updateConnectionStatus(
-        "error"
-      );
-    }
-
-
-    /* ============================================================
-       CONNECTION STATUS
-    ============================================================ */
+    /* =========================================================
+       CONNECTION
+    ========================================================= */
 
     function updateConnectionStatus(
       state
     ) {
 
-      if (
-        state === "online"
-      ) {
+      headerStatus.classList.remove(
+        "online",
+        "offline"
+      );
 
-        headerStatus.classList.remove(
-          "error"
-        );
+
+      if (
+        state ===
+        "online"
+      ) {
 
         headerStatus.classList.add(
           "online"
         );
 
-        /*
-         * Keep your match's hostel/status
-         * instead of displaying "Online".
-         */
 
         headerStatus.textContent =
           otherProfile?.hostel ||
           "IISERB";
 
-        return;
-      }
 
-
-      if (
-        state === "offline"
-      ) {
-
-        headerStatus.classList.remove(
-          "online"
-        );
+      } else {
 
         headerStatus.classList.add(
-          "error"
+          "offline"
         );
+
 
         headerStatus.textContent =
           "Reconnecting...";
-
-        return;
-      }
-
-
-      if (
-        state === "error"
-      ) {
-
-        headerStatus.classList.remove(
-          "online"
-        );
-
-        headerStatus.classList.add(
-          "error"
-        );
-
-        headerStatus.textContent =
-          "Connection error";
       }
     }
 
 
-    /* ============================================================
+    /* =========================================================
        SCROLL
-    ============================================================ */
-
-    function scrollToBottom() {
-
-      requestAnimationFrame(
-        () => {
-
-          messagesArea.scrollTop =
-            messagesArea.scrollHeight;
-        }
-      );
-    }
-
+    ========================================================= */
 
     function isNearBottom() {
 
@@ -2473,11 +2307,25 @@
     }
 
 
-    /* ============================================================
-       DATE HELPERS
-    ============================================================ */
+    function scrollToBottom() {
 
-    function getDateKey(date) {
+      requestAnimationFrame(
+        function() {
+
+          messagesArea.scrollTop =
+            messagesArea.scrollHeight;
+        }
+      );
+    }
+
+
+    /* =========================================================
+       DATE
+    ========================================================= */
+
+    function getDateKey(
+      date
+    ) {
 
       return [
         date.getFullYear(),
@@ -2500,7 +2348,8 @@
 
 
       yesterday.setDate(
-        yesterday.getDate() - 1
+        yesterday.getDate() -
+        1
       );
 
 
@@ -2533,9 +2382,9 @@
     }
 
 
-    /* ============================================================
+    /* =========================================================
        TOAST
-    ============================================================ */
+    ========================================================= */
 
     function showToast(
       message
@@ -2563,7 +2412,7 @@
 
       toastTimer =
         setTimeout(
-          () => {
+          function() {
 
             toast.classList.remove(
               "show"
@@ -2575,9 +2424,9 @@
     }
 
 
-    /* ============================================================
-       TEXT SAFETY
-    ============================================================ */
+    /* =========================================================
+       SECURITY
+    ========================================================= */
 
     function escapeHtml(
       value
@@ -2643,35 +2492,35 @@
       name
     ) {
 
-      if (!name) {
+      if (
+        !name
+      ) {
 
         return "?";
       }
 
 
-      return String(name)
+      return String(
+        name
+      )
         .trim()
         .charAt(0)
         .toUpperCase();
     }
 
 
-    /* ============================================================
-       PAGE VISIBILITY
-    ============================================================ */
+    /* =========================================================
+       VISIBILITY / RECONNECT
+    ========================================================= */
 
     document.addEventListener(
       "visibilitychange",
-      async () => {
+      async function() {
 
         if (
           document.visibilityState ===
           "visible"
         ) {
-
-          /*
-           * Refresh session before reconnecting.
-           */
 
           try {
 
@@ -2682,11 +2531,13 @@
 
 
             if (
-              data?.session
+              data &&
+              data.session
             ) {
 
               myUserId =
                 data.session.user.id;
+
 
               await subscribeRealtime();
             }
@@ -2694,7 +2545,7 @@
           } catch (error) {
 
             console.warn(
-              "Visibility reconnect:",
+              "Reconnect failed:",
               error
             );
           }
@@ -2703,13 +2554,16 @@
     );
 
 
-    /* ============================================================
+    /* =========================================================
        CLEANUP
-    ============================================================ */
+    ========================================================= */
 
     window.addEventListener(
       "beforeunload",
-      cleanupRealtime
+      function() {
+
+        cleanupRealtime();
+      }
     );
 
   </script>
