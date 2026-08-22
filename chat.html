@@ -1516,18 +1516,18 @@
               }
             });
       
-        } catch (error) {
-          console.error(
-            "❌ REALTIME SETUP FAILED:",
-            error
-          );
-      
-          updateConnectionStatus("offline");
-      
-          scheduleRealtimeRetry();
-        }
-      }
+      } catch (error) {
+        console.error(
+          "Realtime setup failed:",
+          error
+        );
 
+        updateConnectionStatus("offline");
+      }
+    }
+
+    } // ← ADD THIS
+    
     function handleRealtimeMessage(message) {
 
       if (
