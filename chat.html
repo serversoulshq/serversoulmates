@@ -1437,15 +1437,12 @@
 
       async function subscribeRealtime() {
         try {
-          if (realtimeChannel) {
-            await _sb.removeChannel(realtimeChannel);
-            realtimeChannel = null;
-          }
+          cleanupRealtime();
       
-          console.log("Starting realtime:", matchId);
+          console.log("Starting realtime for match:", matchId);
       
           realtimeChannel = _sb
-            .channel("chat-" + matchId)
+            .channel(`server-souls-chat-${matchId}-${myUserId}`)
       
             .on(
               "postgres_changes",
@@ -1455,12 +1452,13 @@
                 table: "messages"
               },
               function (payload) {
-                console.log("REALTIME EVENT:", payload);
+                console.log("🔥 REALTIME EVENT:", payload);
       
                 const message = payload.new;
       
                 if (!message) return;
       
+                // Only process messages for this chat
                 if (
                   String(message.match_id) !==
                   String(matchId)
@@ -1472,6 +1470,7 @@
       
                 const id = String(message.id);
       
+                // Prevent duplicates
                 if (messages.has(id)) {
                   return;
                 }
@@ -1482,39 +1481,50 @@
                   forceScroll: true
                 });
       
-                console.log("New message displayed");
+                console.log("✅ New message displayed");
               }
             )
       
             .subscribe(function (status) {
-              console.log("REALTIME STATUS:", status);
+              console.log("📡 REALTIME STATUS:", status);
       
               if (status === "SUBSCRIBED") {
-                console.log("REALTIME CONNECTED");
+                console.log("✅ REALTIME CONNECTED");
                 updateConnectionStatus("online");
               }
       
               if (
                 status === "CHANNEL_ERROR" ||
-                status === "TIMED_OUT" ||
-                status === "CLOSED"
+                status === "TIMED_OUT"
               ) {
                 console.error(
-                  "Realtime connection problem:",
+                  "❌ REALTIME CONNECTION ERROR:",
                   status
                 );
       
                 updateConnectionStatus("offline");
+      
+                scheduleRealtimeRetry();
+              }
+      
+              if (status === "CLOSED") {
+                console.warn("⚠️ REALTIME CLOSED");
+      
+                updateConnectionStatus("offline");
+      
+                scheduleRealtimeRetry();
               }
             });
       
         } catch (error) {
           console.error(
-            "Realtime setup failed:",
+            "❌ REALTIME SETUP FAILED:",
             error
           );
       
           updateConnectionStatus("offline");
+      
+          scheduleRealtimeRetry();
         }
       }
 
